@@ -92,7 +92,7 @@ const registrarProducto = async (req, res) => {
         // Enviamos un mensaje de Producto Registrado y los detalles del producto registrado
         res.status(200).json({ message: 'Producto Registrado', Producto: nuevoProducto }); 
     }catch (err){
-        // Enviamos un mensaje de error en caso de que no se puedan mostrar el producto
+        // Enviamos un mensaje de error en caso de que no se pueda registrar el producto
         res.status(500).json({ message : 'Error al registrar el producto'})
         // Mostramos los errores
         console.log(err)
@@ -140,9 +140,30 @@ const updatePortafolio = async(req,res)=>{
     res.redirect('/portafolios')
 }
 
-// Metodo eliminar 
-const deletePortafolio = async(req,res)=>{
-    const portafolio = await Portfolio.findByIdAndDelete(req.params.id)
-    await deleteImage(portafolio.image.public_id)
-    res.redirect('/portafolios')
+const borrarProducto = async (req, res) => {
+    // Obtenemos el valor de id de la url
+    const productoId = req.params.id
+    try{
+        // Buscamos en la base de datos ese producto y lo eliminamos
+        const productoEliminado = await Producto.findByIdAndDelete({ productoId })
+        // Eliminamos la imagen del producto
+        await deleteImage(portafolio.image.public_id)
+        // En caso de que no exista ese producto enviamos un mensaje
+        if(!productoEliminado) return res.satus(404).json({ message : 'No se encontro el producto para borrar'})
+        // Enviamos un mensaje indicando que se borro el producto
+        res.status(200).json({ message: 'Producto borrrado' });
+    }catch (err){
+        // Enviamos un mensaje de error en caso de que no se puedan borrar el producto
+        res.status(500).json({ message : 'Error al borrar el producto'})
+        // Mostramos los errores
+        console.log(err)
+    }
+}
+
+export {
+    mostrarProductos,
+    buscarProducto,
+    registrarProducto,
+    actualizarProducto,
+    borrarProducto
 }
