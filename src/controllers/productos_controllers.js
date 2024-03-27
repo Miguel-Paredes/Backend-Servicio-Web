@@ -1,7 +1,7 @@
-import Producto from '../models/productos.js'
-import fs from 'fs-extra'
-import { deleteImage, uploadImage } from "../config/cloudinary"
-import mongoose from 'mongoose'
+const Producto = require ('../models/productos.js')
+const fs = require ('fs-extra')
+const { deleteImage, uploadImage } = require ("../config/cloudinary.js")
+const mongoose = require ('mongoose')
 
 const mostrarProductos = async (req, res) => {
     try {
@@ -147,7 +147,7 @@ const borrarProducto = async (req, res) => {
         // Buscamos en la base de datos ese producto y lo eliminamos
         const productoEliminado = await Producto.findByIdAndDelete({ productoId })
         // Eliminamos la imagen del producto
-        await deleteImage(portafolio.image.public_id)
+        await deleteImage(producto.image.public_id)
         // En caso de que no exista ese producto enviamos un mensaje
         if(!productoEliminado) return res.satus(404).json({ message : 'No se encontro el producto para borrar'})
         // Enviamos un mensaje indicando que se borro el producto
@@ -160,7 +160,7 @@ const borrarProducto = async (req, res) => {
     }
 }
 
-export {
+module.exports = {
     mostrarProductos,
     buscarProducto,
     registrarProducto,

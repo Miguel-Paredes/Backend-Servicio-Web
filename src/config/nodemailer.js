@@ -1,5 +1,5 @@
 // Importa el módulo nodemailer
-import nodemailer from "nodemailer";
+const nodemailer = require("nodemailer");
 
 let transporter = nodemailer.createTransport({
     // Servicio de correo utilizado (en este caso, Gmail)
@@ -107,7 +107,7 @@ const sendMailToEmpresa = async(userMail,password)=>{
     console.log("Mensaje enviado satisfactoriamente: ", info.messageId);
 }
 
-export {
+module.exports = {
     sendMailToUser,
     sendMailToRecoveryPassword,
     sendMailToEmpresa

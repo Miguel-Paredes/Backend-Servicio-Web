@@ -1,5 +1,6 @@
 // Importar Cloudinary
 const cloudinary = require('cloudinary').v2;
+const multer = require('multer')
 
 // Establecer las variables de entorno
 cloudinary.config({ 
@@ -10,10 +11,10 @@ cloudinary.config({
 });
 
 // Crear el metodo para enviar la imagen a clodinary y que la misma
-// se almacene en un directorio llamado portafolio
+// se almacene en un directorio llamado productos
 
 const uploadImage = async(filePath) => {
-    return await cloudinary.uploader.upload(filePath,{folder:'portafolio'})
+    return await cloudinary.uploader.upload(filePath,{folder:'productos'})
 }
 
 const deleteImage = async (publicId)=>{
@@ -21,7 +22,7 @@ const deleteImage = async (publicId)=>{
     return await cloudinary.uploader.destroy(publicId)
 }
 
-export {
+module.exports = {
     uploadImage,
     deleteImage
 }

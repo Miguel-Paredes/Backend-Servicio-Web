@@ -1,12 +1,14 @@
 // Importaciones
     // Importamos express
-    import express from 'express'
+    const express = require('express')
     // Importamos cors
-    import cors from 'cors'
+    const cors = require('cors')
     // Importamos dotenv
-    import dotenv from 'dotenv'
+    const dotenv = require('dotenv')
+    // Importacion de fileUpload
+    const fileUpload = require('express-fileupload')
     // Importamos routerProductos para manejar las solicitudes a la ruta /api/productos
-    import routerProductos from './routers/router_productos.js'
+    const routerProductos = require('./routers/router_productos.js')
 
 // Inicializaciones
     // Creamos una variable que nos permita usar express
@@ -20,13 +22,17 @@
     app.set('port', process.env.port || 3000)
     // Habilitamos el middleware de CORS para permitir solicitudes de diferentes orígenes
     app.use(cors())
+    // Establecer la carpeta temporal y el directorio
+    app.use(fileUpload({
+        useTempFiles : true,
+        tempFileDir : './uploads'
+    }));
 
 // Middlewares
     // Hacemos que el servidor use archivos json
     app.use(express.json())
 
 // Rutas
-    app.get('/', (req, res) => res.send('Bienvenido'))
     // Utilizamos routerProductos para manejar las solicitudes a la ruta /api/productos
     app.use('/api/productos', routerProductos)
 
@@ -34,4 +40,4 @@
     app.use((req, res) => res.status(404).end())
 
 // Exportamos express por medio de la variable app
-export default app
+module.exports = app

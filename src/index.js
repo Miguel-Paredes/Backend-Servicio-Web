@@ -1,8 +1,8 @@
 // Importaciones
     // Importamos la funcion connection del archivo database.js
-    import connection from "./database.js";
+    const connection = require("./database.js");
     // Importamos la variable app del archivo server.js
-    import app from "./server.js";
+    const app = require("./server.js");
 
 // Hacemos el uso de la funcion connection
 connection()

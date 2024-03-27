@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 const productoSchema = new mongoose.Schema({
     _id : mongoose.Schema.Types.ObjectId,
@@ -19,4 +19,4 @@ productoSchema.pre('save', function (next) {
     next();
   });
 
-export default mongoose.model("Producto", productoSchema);
+module.exports = mongoose.model("Producto", productoSchema);

@@ -1,5 +1,5 @@
 // Importamos mongoose 
-import mongoose from "mongoose";
+const mongoose = require("mongoose");
 
 // Al colocar strictQuery permitimos que solo los campos defininos en el Schema
 // se puedan almacenar en la base de datos
@@ -20,4 +20,4 @@ const connection = async () => {
 }
 
 // Exportamos la funcion
-export default connection
+module.exports = connection
