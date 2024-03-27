@@ -7,6 +7,8 @@
     const dotenv = require('dotenv')
     // Importacion de fileUpload
     const fileUpload = require('express-fileupload')
+    // Importacion de multer
+    const multer = require('multer')
     // Importamos routerProductos para manejar las solicitudes a la ruta /api/productos
     const routerProductos = require('./routers/router_productos.js')
 
@@ -17,6 +19,7 @@
     dotenv.config()
 
 // Configuraciones
+    // const upload = multer({ dest : 'uploads'})
     // Configuramos una variable dentro de app que almacena
     // el puerto en el cual se va a alzar el servidor
     app.set('port', process.env.port || 3000)

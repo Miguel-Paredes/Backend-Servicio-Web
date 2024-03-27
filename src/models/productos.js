@@ -7,7 +7,6 @@ const productoSchema = new mongoose.Schema({
     precio : { type : Number, required : true, trim : true },
     descripcion : { type : String, trim : true },
     categoria : { type : String, trim : true },
-    disponible : { type : Boolean, default : true, trim : true },
     imagen : { public_id : String, secure_url : String}
 });
 

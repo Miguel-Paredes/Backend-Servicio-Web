@@ -25,7 +25,7 @@ routerProductos.get('/buscar/:id', buscarProducto);
 routerProductos.post('/registro', registrarProducto);
 
 // Ruta para actualizar un producto
-// routerProductos.put('/actualizar/:id', actualizarProducto)
+routerProductos.put('/actualizar/:id', actualizarProducto)
 
 // Ruta para borrar un producto
 routerProductos.delete('/borrar/:id', borrarProducto);
