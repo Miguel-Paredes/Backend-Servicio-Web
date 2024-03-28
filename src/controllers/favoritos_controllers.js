@@ -1,6 +1,5 @@
 const Favorito = require ('../models/favoritos.js')
-const fs = require ('fs-extra')
-const { deleteImage, uploadImage } = require ("../config/cloudinary.js")
+const Producto = require ('../models/productos.js')
 const mongoose = require ('mongoose')
 
 const mostrarFavoritos = async (req, res) => {
@@ -53,57 +52,75 @@ const buscarFavorito = async (req, res) => {
 }
 
 const registrarFavorito = async (req, res) => {
-    // Desestructuramos el objeto req.body
-    // Extraemos las propiedades nombre, cantidad, precio, descripcion y categoria en variables separadas 
-    const { nombre, cantidad, precio, descripcion, categoria, imagen } = req.body
     try {
-        // Buscamos si el nombre del Favorito ya se encuentra registrado
-        const exisNombre = await Favorito.findOne({ nombre })
-        // En caso de ya estar registrado enviamos un mensaje
-        if(exisNombre) return res.json({ message : 'Ya existe un Favorito con ese nombre'})
-        // Colocamos condicionales para evitar que se ingresen numeros negativos
-        // En caso de que la cantidad sea menor a 1 y el precio menor a 0 enviamos un mensaje
-        if (cantidad < 0 && precio <= 0) return res.json({ message: 'La cantidad debe ser mayor a 1 y el precio debe ser mayor a 0' });
-        // En caso de que la cantidad sea menor a 1 enviamos un mensaje
-        else if (cantidad <= 0 ) return res.json({ message : 'La cantidad debe de ser mayor a 1'})
-        // En caso de que el precio menor a 0 enviamos un mensaje
-        else if (precio <= 0) return res.json ({ message : 'El precio debe de ser mayor a 0'})
-        // Creamos una nueva instancia 
+        // Buscamos el producto correspondiente al identificador proporcionado
+        const producto = await Producto.findById(req.body.producto);
+        // Verificamos si el producto existe
+        if (!producto) return res.json({ message: 'El producto no existe' });
+        // Creamos una nueva instancia de Favorito
         const nuevoFavorito = new Favorito({
-            // Genera un nuevo ID para el Favorito
-            _id: new mongoose.Types.ObjectId,
-            // Asignamos el valor de la variable nombre a la propiedad nombre
-            nombre,
-            // Asignamos el valor de la variable cantidad a la propiedad cantidad
-            cantidad,
-            // Asignamos el valor de la variable precio a la propiedad precio
-            precio,
-            // Asignamos el valor de la variable descripcion a la propiedad descripcion
-            descripcion,
-            // Asignamos el valor de la variable categoria a la propiedad categoria
-            categoria
+            _id: new mongoose.Types.ObjectId(),
+            producto: producto._id,
+            nombre: producto.nombre,
+            precio: producto.precio,
+            descripcion: producto.descripcion,
+            categoria: producto.categoria,
+            imagen:{
+                public_id: producto.imagen.public_id,
+                secure_url: producto.imagen.secure_url
+            }
         });
-        if(imagen){
-            // Carga la imagen utilizando una función 'uploadImage' y espera a que se complete
-            const imageUpload = await uploadImage(req.files.imagen.tempFilePath); 
-            nuevoFavorito.imagen = {
-                // Asignamos el public_id de la imagen cargada a la propiedad public_id
-                public_id: imageUpload.public_id, 
-                // Asignamos la secure_url de la imagen cargada a la propiedad secure_url
-                secure_url: imageUpload.secure_url 
-            };
-            // Eliminamos el archivo temporal de la imagen utilizando el módulo fs
-            await fs.unlink(req.files.image.tempFilePath); 
-        }
-        // Guardamos el nuevo Favorito en la base de datos
-        await nuevoFavorito.save(); 
+        await nuevoFavorito.save();
         // Enviamos un mensaje de Favorito Registrado y los detalles del Favorito registrado
-        res.status(200).json({ message: 'Favorito Registrado', Favorito: nuevoFavorito }); 
-    }catch (err){
+        res.status(200).json({ message: 'Favorito Registrado', Favorito: nuevoFavorito });
+    } catch (err) {
         // Enviamos un mensaje de error en caso de que no se pueda registrar el Favorito
-        res.status(500).json({ message : 'Error al registrar el Favorito'})
+        res.status(500).json({ message: 'Error al registrar el Favorito' });
         // Mostramos los errores
-        console.log(err)
+        console.log(err);
+    }
+}
+
+const actualizarFavorito = async (productoId) => {
+    try {
+        // Buscamos el producto correspondiente al identificador proporcionado
+        const producto = await Producto.findById(productoId);
+        // Almacenamos esta informacion en otra variable
+        const busc = productoId
+        // Actualizamos los campos del favorito con la información del producto actualizada
+        const nombre = producto.nombre
+        const precio = producto.precio
+        const descripcion = producto.descripcion
+        const categoria = producto.categoria
+        const imagen = producto.imagen
+        // Buscamos el favorito correspondiente al producto
+        const buscarFavorito = await Favorito.find({producto})
+        // Usamos un bucle para que busque en todos los favoritos el producto y los actualice
+        for(let i = 0 ; i < buscarFavorito.length ; i++){
+            // Usamos la funcion String para poder comparar mas facilmente
+            if(String(buscarFavorito[i].producto) === String(busc)){
+                await Favorito.findByIdAndUpdate(
+                    buscarFavorito[i]._id,
+                    {
+                        nombre,
+                        precio,
+                        descripcion,
+                        categoria,
+                        imagen,
+                    },
+                    {
+                        new : true
+                    }
+                    );
+            }
+        }
+        // Enviamos un mensaje a consola indicando que ya se actualizaron todos los favoritos
+        console.log('Favoritos actualizados')
+    } catch (err) {
+        // Enviamos un mensaje de error en caso de que no se pueda actualizar el Favorito
+        console.log({ message: 'Error al actualizar los Favoritos' });
+        // Mostramos los errores
+        console.log(err);
     }
 }
 
@@ -112,16 +129,8 @@ const borrarFavorito = async (req, res) => {
     const FavoritoId = req.params.id;
     try {
         // Buscamos en la base de datos ese Favorito y lo eliminamos
-        let FavoritoEliminado = await Favorito.findById(FavoritoId);
-        if (!FavoritoEliminado) {
-            return res.status(404).json({ message: 'No se encontró el Favorito para borrar' });
-        }
-        if (FavoritoEliminado.imagen.length != undefined) {
-            // Eliminamos la imagen del Favorito
-            await deleteImage(FavoritoEliminado.imagen.public_id);
-        }
-        // Eliminamos el Favorito de la base de datos
-        await Favorito.findByIdAndDelete(FavoritoId);
+        const FavoritoEliminado = await Favorito.findByIdAndDelete(FavoritoId);
+        if (!FavoritoEliminado) return res.status(404).json({ message: 'No se encontró el Favorito para borrar' });
         // Enviamos un mensaje indicando que se borró el Favorito
         res.status(200).json({ message: 'Favorito borrado' });
     } catch (err) {
@@ -132,9 +141,32 @@ const borrarFavorito = async (req, res) => {
     }
 };
 
+const eliminarFavorito = async (productoId) => {
+    try{
+        // Almacenamos la informacion de productoId en una variable
+        const busc = productoId
+        // Buscamos el favorito correspondiente al producto
+        const buscarFavorito = await Favorito.find({productoId})
+        // Usamos un bucle para que busque en todos los favoritos el producto y los elimine
+        for(let i = 0 ; i < buscarFavorito.length ; i++){
+            // Usamos la funcion String para poder comparar mas facilmente
+            if(String(buscarFavorito[i].producto) === String(busc)){
+                await Favorito.findByIdAndDelete(buscarFavorito[i]._id)
+            }
+        }
+        // Enviamos un mensaje a consola indicando que ya se eliminaron todos los favoritos
+        console.log('Favoritos eliminados')
+    }catch(err){
+        console.log('Error al eliminar todos los favoritos')
+        console.log(err)
+    }
+}
+
 module.exports = {
     mostrarFavoritos,
     buscarFavorito,
     registrarFavorito,
-    borrarFavorito
+    actualizarFavorito,
+    borrarFavorito,
+    eliminarFavorito
 }

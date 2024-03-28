@@ -7,10 +7,10 @@
     const dotenv = require('dotenv')
     // Importacion de fileUpload
     const fileUpload = require('express-fileupload')
-    // Importacion de multer
-    const multer = require('multer')
     // Importamos routerProductos para manejar las solicitudes a la ruta /api/productos
     const routerProductos = require('./routers/router_productos.js')
+    // Importamos routerFavoritos para manejar las solicitudes a la ruta /api/favoritos
+    const routerFavoritos = require('./routers/router_favoritos.js')
 
 // Inicializaciones
     // Creamos una variable que nos permita usar express
@@ -38,6 +38,8 @@
 // Rutas
     // Utilizamos routerProductos para manejar las solicitudes a la ruta /api/productos
     app.use('/api/productos', routerProductos)
+    // Utilizamos routerFavoritos para manejar las solicitudes a la ruta /api/favoritos
+    app.use('/api/favoritos', routerFavoritos)
 
     // Manejo de rutas en caso de que no sean encontradas
     app.use((req, res) => res.status(404).end())

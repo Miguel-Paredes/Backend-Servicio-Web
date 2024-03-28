@@ -1,7 +1,8 @@
 const Producto = require ('../models/productos.js')
 const fs = require ('fs-extra')
 const { deleteImage, uploadImage } = require ("../config/cloudinary.js")
-const mongoose = require ('mongoose')
+const mongoose = require ('mongoose');
+const { actualizarFavorito, eliminarFavorito } = require('./favoritos_controllers.js');
 
 const mostrarProductos = async (req, res) => {
     try {
@@ -55,7 +56,7 @@ const buscarProducto = async (req, res) => {
 const registrarProducto = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades nombre, cantidad, precio, descripcion y categoria en variables separadas 
-    const { nombre, cantidad, precio, descripcion, categoria, imagen } = req.body
+    const { nombre, cantidad, precio, descripcion, categoria } = req.body
     try {
         // Buscamos si el nombre del Producto ya se encuentra registrado
         const exisNombre = await Producto.findOne({ nombre })
@@ -83,18 +84,17 @@ const registrarProducto = async (req, res) => {
             // Asignamos el valor de la variable categoria a la propiedad categoria
             categoria
         });
-        if(imagen){
-            // Carga la imagen utilizando una función 'uploadImage' y espera a que se complete
-            const imageUpload = await uploadImage(req.files.imagen.tempFilePath); 
-            nuevoProducto.imagen = {
-                // Asignamos el public_id de la imagen cargada a la propiedad public_id
-                public_id: imageUpload.public_id, 
-                // Asignamos la secure_url de la imagen cargada a la propiedad secure_url
-                secure_url: imageUpload.secure_url 
-            };
-            // Eliminamos el archivo temporal de la imagen utilizando el módulo fs
-            await fs.unlink(req.files.image.tempFilePath); 
-        }
+        if(!(req.files?.imagen)) return res.json({ message : "Se requiere una imagen" })
+        // Carga la imagen utilizando una función 'uploadImage' y espera a que se complete
+        const imageUpload = await uploadImage(req.files.imagen.tempFilePath); 
+        nuevoProducto.imagen = {
+            // Asignamos el public_id de la imagen cargada a la propiedad public_id
+            public_id: imageUpload.public_id, 
+            // Asignamos la secure_url de la imagen cargada a la propiedad secure_url
+            secure_url: imageUpload.secure_url
+        };
+        // Eliminamos el archivo temporal de la imagen utilizando el módulo fs
+        await fs.unlink(req.files.imagen.tempFilePath); 
         // Guardamos el nuevo Producto en la base de datos
         await nuevoProducto.save(); 
         // Enviamos un mensaje de Producto Registrado y los detalles del Producto registrado
@@ -146,12 +146,14 @@ const actualizarProducto = async (req, res) => {
                 secure_url: imageUpload.secure_url 
             };
             // Eliminamos el archivo temporal de la imagen utilizando el módulo fs
-            await fs.unlink(req.files.image.tempFilePath); 
+            await fs.unlink(req.files.imagen.tempFilePath); 
         }
         // Guardamos el nuevo Producto en la base de datos
         await ProductoActualizado.save(); 
-        // Enviamos un mensaje de Producto Registrado y los detalles del Producto registrado
-        res.status(200).json({ message: 'Producto Registrado', Producto: ProductoActualizado }); 
+        // Llamamos al controlador actualizarFavorito y pasamos ProductoId como argumento
+        await actualizarFavorito(ProductoId);
+        // Enviamos un mensaje de Producto Actualizado y los detalles del Producto registrado
+        res.status(200).json({ message: 'Producto Actualizado', Producto: ProductoActualizado }); 
     }catch (err){
         // Enviamos un mensaje de error en caso de que no se pueda actualizar el Producto
         res.status(500).json({ message : 'Error al actualizar el Producto'})
@@ -166,13 +168,11 @@ const borrarProducto = async (req, res) => {
     try {
         // Buscamos en la base de datos ese Producto y lo eliminamos
         let productoEliminado = await Producto.findById(productoId);
-        if (!productoEliminado) {
-            return res.status(404).json({ message: 'No se encontró el Producto para borrar' });
-        }
-        if (productoEliminado.imagen.length != undefined) {
-            // Eliminamos la imagen del Producto
-            await deleteImage(productoEliminado.imagen.public_id);
-        }
+        if (!productoEliminado) return res.status(404).json({ message: 'No se encontró el Producto para borrar' });
+        // Llamamos al controlador actualizarFavorito y pasamos ProductoId como argumento
+        await eliminarFavorito(productoId)
+        // Eliminamos la imagen del Producto
+        await deleteImage(productoEliminado.imagen.public_id);
         // Eliminamos el Producto de la base de datos
         await Producto.findByIdAndDelete(productoId);
         // Enviamos un mensaje indicando que se borró el Producto

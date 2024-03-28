@@ -7,20 +7,20 @@ const favoritoSchema = new mongoose.Schema({
         ref: "Producto",
         required: true
     }
+    // Cuando se agregue la logica de Clientes
+    // clientes: [{
+    //     type: mongoose.Schema.Types.ObjectId,
+    //     ref: "Cliente"
+    // }]
 });
 
-// Copia los campos del modelo Producto en el modelo Favorito
+// Copiamos los campos del modelo Producto en el modelo Favorito
 favoritoSchema.add({
     nombre: {
         type: String,
         required: true,
-        unique: true,
-        trim: true
-    },
-    cantidad: {
-        type: Number,
-        required: true,
-        trim: true
+        trim: true,
+        index: false 
     },
     precio: {
         type: Number,

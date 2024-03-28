@@ -1,6 +1,7 @@
 // Importar Cloudinary
 const cloudinary = require('cloudinary').v2;
-const multer = require('multer')
+// Importamos dotenv
+const dotenv = require('dotenv').config()
 
 // Establecer las variables de entorno
 cloudinary.config({ 
@@ -14,12 +15,12 @@ cloudinary.config({
 // se almacene en un directorio llamado productos
 
 const uploadImage = async(filePath) => {
-    return await cloudinary.uploader.upload(filePath,{folder:'productos'})
+    return await cloudinary.uploader.upload( filePath, { folder : 'productos' })
 }
 
 const deleteImage = async (publicId)=>{
     
-    return await cloudinary.uploader.destroy(publicId)
+    return await cloudinary.uploader.destroy( publicId )
 }
 
 module.exports = {
