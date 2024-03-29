@@ -1,5 +1,8 @@
+// Importamos el modelo Favorito
 const Favorito = require ('../models/favoritos.js')
+// Importamos el modelo Producto
 const Producto = require ('../models/productos.js')
+// Importamos moongose
 const mongoose = require ('mongoose')
 
 const mostrarFavoritos = async (req, res) => {
@@ -99,6 +102,7 @@ const actualizarFavorito = async (productoId) => {
         for(let i = 0 ; i < buscarFavorito.length ; i++){
             // Usamos la funcion String para poder comparar mas facilmente
             if(String(buscarFavorito[i].producto) === String(busc)){
+                // Buscamos y actualizamos todos los productos
                 await Favorito.findByIdAndUpdate(
                     buscarFavorito[i]._id,
                     {
@@ -130,6 +134,7 @@ const borrarFavorito = async (req, res) => {
     try {
         // Buscamos en la base de datos ese Favorito y lo eliminamos
         const FavoritoEliminado = await Favorito.findByIdAndDelete(FavoritoId);
+        // Indicamos un mensaje en caso de que no exista ese producto
         if (!FavoritoEliminado) return res.status(404).json({ message: 'No se encontró el Favorito para borrar' });
         // Enviamos un mensaje indicando que se borró el Favorito
         res.status(200).json({ message: 'Favorito borrado' });
@@ -151,17 +156,21 @@ const eliminarFavorito = async (productoId) => {
         for(let i = 0 ; i < buscarFavorito.length ; i++){
             // Usamos la funcion String para poder comparar mas facilmente
             if(String(buscarFavorito[i].producto) === String(busc)){
+                // Vamos eliminando cada producto en los favoritos
                 await Favorito.findByIdAndDelete(buscarFavorito[i]._id)
             }
         }
         // Enviamos un mensaje a consola indicando que ya se eliminaron todos los favoritos
         console.log('Favoritos eliminados')
     }catch(err){
+        // Enviamos un mensaje de error en caso de que no se pueda eliminar los Favoritos
         console.log('Error al eliminar todos los favoritos')
+        // Mostramos los errores
         console.log(err)
     }
 }
 
+// Exportamos los controladores
 module.exports = {
     mostrarFavoritos,
     buscarFavorito,

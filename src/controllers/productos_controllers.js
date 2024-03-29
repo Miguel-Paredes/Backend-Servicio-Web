@@ -57,6 +57,8 @@ const registrarProducto = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades nombre, cantidad, precio, descripcion y categoria en variables separadas 
     const { nombre, cantidad, precio, descripcion, categoria } = req.body
+    // Validar todos los campos llenos
+    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
     try {
         // Buscamos si el nombre del Producto ya se encuentra registrado
         const exisNombre = await Producto.findOne({ nombre })
@@ -113,6 +115,8 @@ const actualizarProducto = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades nombre, cantidad, precio, descripcion y categoria en variables separadas 
     const { nombre, cantidad, precio, descripcion, categoria, imagen } = req.body
+    // Validar todos los campos llenos
+    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
     try{
         let ProductoActualizado = await Producto.findById( ProductoId )
         if(!ProductoActualizado) return res.status(404).json({ message : 'No se encontro el Producto para actualizar'})
@@ -185,6 +189,7 @@ const borrarProducto = async (req, res) => {
     }
 };
 
+// Exportamos los controladores
 module.exports = {
     mostrarProductos,
     buscarProducto,

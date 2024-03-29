@@ -11,6 +11,7 @@
     const routerProductos = require('./routers/router_productos.js')
     // Importamos routerFavoritos para manejar las solicitudes a la ruta /api/favoritos
     const routerFavoritos = require('./routers/router_favoritos.js')
+const routerLogin = require('./routers/router_login.js')
 
 // Inicializaciones
     // Creamos una variable que nos permita usar express
@@ -19,7 +20,6 @@
     dotenv.config()
 
 // Configuraciones
-    // const upload = multer({ dest : 'uploads'})
     // Configuramos una variable dentro de app que almacena
     // el puerto en el cual se va a alzar el servidor
     app.set('port', process.env.port || 3000)
@@ -40,6 +40,8 @@
     app.use('/api/productos', routerProductos)
     // Utilizamos routerFavoritos para manejar las solicitudes a la ruta /api/favoritos
     app.use('/api/favoritos', routerFavoritos)
+    // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/login
+    app.use('/api/login', routerLogin)
 
     // Manejo de rutas en caso de que no sean encontradas
     app.use((req, res) => res.status(404).end())

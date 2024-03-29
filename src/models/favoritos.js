@@ -1,43 +1,43 @@
 const mongoose = require("mongoose");
 
 const favoritoSchema = new mongoose.Schema({
-    _id: mongoose.Schema.Types.ObjectId,
-    producto: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "Producto",
-        required: true
+    _id : mongoose.Schema.Types.ObjectId,
+    producto : {
+        type : mongoose.Schema.Types.ObjectId,
+        ref : "Producto",
+        required : true
     }
     // Cuando se agregue la logica de Clientes
-    // clientes: [{
-    //     type: mongoose.Schema.Types.ObjectId,
-    //     ref: "Cliente"
+    // clientes : [{
+    //     type : mongoose.Schema.Types.ObjectId,
+    //     ref : "Cliente"
     // }]
 });
 
 // Copiamos los campos del modelo Producto en el modelo Favorito
 favoritoSchema.add({
-    nombre: {
-        type: String,
-        required: true,
-        trim: true,
-        index: false 
+    nombre : {
+        type : String,
+        required : true,
+        trim : true,
+        index : false 
     },
-    precio: {
-        type: Number,
-        required: true,
-        trim: true
+    precio : {
+        type : Number,
+        required : true,
+        trim : true
     },
-    descripcion: {
-        type: String,
-        trim: true
+    descripcion : {
+        type : String,
+        trim : true
     },
-    categoria: {
-        type: String,
-        trim: true
+    categoria : {
+        type : String,
+        trim : true
     },
-    imagen: {
-        public_id: String,
-        secure_url: String
+    imagen : {
+        public_id : String,
+        secure_url : String
     }
 });
 

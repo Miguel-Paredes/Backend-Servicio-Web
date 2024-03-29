@@ -13,13 +13,12 @@ cloudinary.config({
 
 // Crear el metodo para enviar la imagen a clodinary y que la misma
 // se almacene en un directorio llamado productos
-
 const uploadImage = async(filePath) => {
     return await cloudinary.uploader.upload( filePath, { folder : 'productos' })
 }
 
+// Eliminamos la imagen que se encuentra en cloudinary
 const deleteImage = async (publicId)=>{
-    
     return await cloudinary.uploader.destroy( publicId )
 }
 
