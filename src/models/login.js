@@ -48,7 +48,7 @@ RegistroSchema.methods.isCorrectPassword = async function (password) {
   }
 };
 
-RegistroSchema.methods.crearToken = function(){
+RegistroSchema.methods.crearToken = function () {
     // Genera un token aleatorio utilizando Math.random() y lo asigna al campo token
     const tokenGenerado = this.token = Math.random().toString(36).slice(2);
     // Retorna el token generado

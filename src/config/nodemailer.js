@@ -25,35 +25,27 @@ const sendMailToUser = (userMail, token) => {
          // Asunto del correo
         subject: "Verifica tu cuenta",
         html: `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Bienvenido al Sistema de Gestión de Estudiantes</title>
-        </head>
         <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; display: flex; justify-content: center; align-items: center; margin-top: 20px; width: 100%;">
-    
             <div style="max-width: 90%; padding: 2rem; text-align: center; border: 1px solid #dddddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-    
-                <h1 style="color: #333333; margin-bottom: 2rem;">¡Bienvenido al Sistema de Gestión de Estudiantes!</h1>
-    
-                
-                <div style="text-align: left; margin-bottom: 1rem;">
-                    <p style="color: #333333; margin-bottom: 2rem; text-align: justify;">Estamos emocionados de tenerte como parte de nuestra comunidad educativa. Aquí encontrarás todas las herramientas, recursos y apoyo que necesitas para tener éxito en tu viaje académico y desarrollarte como estudiante.</p>
+                <div style="background-color: #214E34; /* Fondo verde */ padding: 1rem; border-radius: 10px; /* Bordes redondeados */">
+                    <h1 style="color: #ffffff; margin-bottom: 2rem;">!Bienvenido a nuestra página web! Por favor verifica tu cuenta</h1>
                 </div>
-    
-                <a href=${process.env.URL_FRONTEND}login style="background-color: #007bff; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Iniciar sesión</a>
-    
+                <div style="text-align: left; margin-bottom: 1rem;">
+                    <p style="color: #333333; margin-bottom: 2rem; text-align: justify;">Estamos encantados de tenerte aquí y deseamos que tengas la mejor experiencia de compra en línea. En nuestra tienda en línea, encontrarás una amplia variedad de productos de alta calidad, para satisfacer tus necesidades y gustos.
+                        Si tienes alguna pregunta, inquietud o necesitas asistencia, nuestro equipo de soporte estará encantado de ayudarte en todo momento. Queremos que tu experiencia de compra sea fácil, segura y satisfactoria.
+                        ¡Encuentra productos increíbles y disfruta de la comodidad de comprar desde la comodidad de tu hogar! Esperamos que encuentres todo lo que buscas y más.
+                        ¡Gracias por elegirnos!
+                        
+                        </p>
+                </div>
+                <a href=${process.env.URL}/login/confirmar/${token} style="background-color: #011638; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Confirmar cuenta</a>
                 <footer style="background-color: #ffffff; padding: 1rem; text-align: center;">
-                    <p style="color: #666666; margin: 0;">© 2024 Sistema de Gestión de Estudiantes. Todos los derechos reservados.</p>
+                    <p style="color: #666666; margin: 0;">© 2024 Poner nombre Micromercado. Todos los derechos reservados.</p>
                 </footer>
             </div>
-        </body>
-        </html>    
+        </body> 
         `
     };
-    
     // Envía el correo electrónico utilizando el objeto de transporte
     transporter.sendMail(mailOptions, function(error, info){
         if (error) {
@@ -69,17 +61,26 @@ const sendMailToUser = (userMail, token) => {
 const sendMailToRecoveryPassword = async(userMail,token)=>{
     let info = await transporter.sendMail({
         // Remitente del correo
-    from: 'admin@vet.com',
+    from: 'nombredelamicroempresa@vet.com',
      // Destinatario del correo
     to: userMail,
      // Asunto del correo
     subject: "Correo para reestablecer tu contraseña",
     html: `
-    <h1>Sistema de gestión (VET-ESFOT 🐶 😺)</h1>
-    <hr>
-    <a href=${process.env.URL_FRONTEND}recuperar-password/${token}>Clic para reestablecer tu contraseña</a>
-    <hr>
-    <footer>Grandote te da la Bienvenida!</footer>
+    <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; display: flex; justify-content: center; align-items: center; margin-top: 20px; width: 100%;">
+        <div style="max-width: 90%; padding: 2rem; text-align: center; border: 1px solid #dddddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+            <div style="background-color: #214E34; /* Fondo verde */ padding: 1rem; border-radius: 10px; /* Bordes redondeados */">
+                <h1 style="color: #ffffff; /* Texto blanco */ margin-bottom: 2rem;">Restablece tu contraseña</h1>
+            </div>
+            <div style="text-align: left; margin-bottom: 1rem;">
+                <p style="color: #333333; margin-bottom: 2rem; text-align: justify;">Para garantizar la seguridad de tu cuenta, te pedimos que restablezcas tu contraseña. Sigue el enlace a continuación para completar el proceso:</p>
+            </div>
+            <a href=${process.env.URL}/login/recuperar-password/${token} style="background-color: #011638; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Restablecer Contraseña</a>
+            <footer style="background-color: #ffffff; padding: 1rem; text-align: center;">
+                <p style="color: #666666; margin: 0;">© 2024 Poner nombre Micromercado. Todos los derechos reservados.</p>
+            </footer>
+        </div>
+    </body>
     `
     });
     // Muestra un mensaje de confirmación si el correo se envió correctamente

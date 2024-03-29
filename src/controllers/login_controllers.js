@@ -39,20 +39,20 @@ const inicioLogin = async (req, res) => {
 
 const registroLogin = async (req, res) => {
   // Desestructuramos el objeto req.body
-  // Extraemos las propiedades email y password en variables separadas 
+  // Extraemo la propiedad email en una variable 
   const { email } = req.body;
   try {
     // Validar todos los campos llenos
     if (Object.values(req.body).includes('')) return res.status(400).json({msg:'Lo sentimos, debes llenar todos los campos'})
     // Buscamos el correo en la base de datos
-    const exisUsu = await Registro.findOne(email)
+    const exisUsu = await Registro.findOne({ email })
     // En caso de que exista el correo enviamos un mensaje
     if(exisUsu) return res.status(400).json({ msg:'Lo sentimos, el email ya se encuentra registrado' })
     // Creamos una nueva instancia
     const user = new Registro(req.body);
     // Creamos un token
-    const token = await Registro.crearToken()
-    // Invocar la función paara el envío de correo 
+    const token = await user.crearToken()
+    // Invocar la función para el envío de correo 
     await sendMailToUser(email,token)
     // Guardamos el nuevo Usuario en la base de datos
     await user.save();
@@ -67,6 +67,7 @@ const registroLogin = async (req, res) => {
 };
 
 const confirmEmail = async (req, res) => {
+  const token = req.params.token
   // Verifica si no se proporcionó un token en los parámetros de la solicitud
   if (!(req.params.token)) return res.status(400).json({ msg: "Lo sentimos, no se puede validar la cuenta" });
   // Busca en la base de datos un registro con el token proporcionado
@@ -130,6 +131,8 @@ const nuevoPassword = async (req, res) => {
   if (user?.token !== req.params.token) return res.status(404).json({ msg: 'Lo sentimos, no se puede validar la cuenta' });
   // Establece el campo token en null para indicar que el token ha sido utilizado
   user.token = null;
+  // Guardamos la nueva contraseña
+  user.password = password
   // Guarda los cambios realizados en el objeto user en la base de datos
   await user.save();
   // Enviamos una respuesta de éxito con un mensaje indicando que el password ha sido actualizado

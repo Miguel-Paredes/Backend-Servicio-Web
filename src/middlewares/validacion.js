@@ -11,10 +11,10 @@ const validacion = [
     .customSanitizer(value => value?.trim()),
   // Validación para el campo 'username'
   check("username")
-    .isLength({ min: 3, max: 12 })
-    .withMessage('El campo "username" debe tener entre 3 y 12 caracteres')
-    .isAlpha('es-ES', { ignore: 'áéíóúÁÉÍÓÚñÑ' })
-    .withMessage('El campo "username" debe contener solo letras')
+    .isLength({ min: 3, max: 20 })
+    .withMessage('El campo "username" debe tener entre 3 y 20 caracteres')
+    .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
+    .withMessage('El campo "username" debe contener solo letras y espacios')
     .customSanitizer(value => value?.trim()),
   // Validación para el campo 'email'
   check("email")
