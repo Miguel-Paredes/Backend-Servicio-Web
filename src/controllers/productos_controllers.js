@@ -189,11 +189,38 @@ const borrarProducto = async (req, res) => {
     }
 };
 
+const categoriaProducto = async (req, res) => {
+    // Obtenemos el valor de categoria de la url
+    const categoria = req.params.id
+    try{
+        // Buscamos en la base de datos ese Producto
+        const productoCategoria = await Producto.find({ categoria })
+        // En caso de que no exista esa categoria de Producto enviamos un mensaje
+        if(!productoCategoria) return res.json({ message : 'No existe esa categoria de producto' })
+        // Modificamos el nombre de cada Producto para tener la primera inicial en mayúscula
+        // y las demás en minúscula
+        const listarProductos = productoCategoria.map(Producto => {
+            const nombreProducto = Producto.nombre.charAt(0).toUpperCase() + Producto.nombre.slice(1).toLowerCase();
+            const descripcionProducto = Producto.descripcion.charAt(0).toUpperCase() + Producto.descripcion.slice(1).toLowerCase();
+            const categoriaProducto = Producto.categoria.charAt(0).toUpperCase() + Producto.categoria.slice(1).toLowerCase();
+            return { ...Producto.toObject(), nombre: nombreProducto, descripcion: descripcionProducto, categoria: categoriaProducto };
+        });
+        // Mostramos todos los Productos
+        res.status(200).json(listarProductos);
+    }catch (err) {
+        // Enviamos un mensaje de error en caso de que no se pueda encontrar la categoria del el Producto
+        res.status(500).json({ message: 'Error al buscar la categoria del Producto' });
+        // Mostramos los errores
+        console.log(err);
+    }
+}
+
 // Exportamos los controladores
 module.exports = {
     mostrarProductos,
     buscarProducto,
     registrarProducto,
     actualizarProducto,
-    borrarProducto
+    borrarProducto,
+    categoriaProducto
 }

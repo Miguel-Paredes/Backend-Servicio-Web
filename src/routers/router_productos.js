@@ -3,6 +3,7 @@ const express = require('express');
 // Importamos los controladores
 const {
     actualizarProducto,
+    categoriaProducto,
     borrarProducto,
     buscarProducto,
     mostrarProductos,
@@ -20,6 +21,9 @@ routerProductos.get('/listar', mostrarProductos);
 
 // Ruta para buscar un producto
 routerProductos.get('/buscar/:id', buscarProducto);
+
+// Ruta para buscar productos por categoria
+routerProductos.post('/categoria/:id', categoriaProducto)
 
 // Ruta para crear un nuevo producto
 routerProductos.post('/registro', registrarProducto);
