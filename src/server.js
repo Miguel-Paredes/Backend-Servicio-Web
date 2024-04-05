@@ -11,7 +11,8 @@
     const routerProductos = require('./routers/router_productos.js')
     // Importamos routerFavoritos para manejar las solicitudes a la ruta /api/favoritos
     const routerFavoritos = require('./routers/router_favoritos.js')
-const routerLogin = require('./routers/router_login.js')
+    // Importamos routerLogin para manejar las solicitudes a la ruta /api/login
+    const routerLogin = require('./routers/router_login.js')
 
 // Inicializaciones
     // Creamos una variable que nos permita usar express

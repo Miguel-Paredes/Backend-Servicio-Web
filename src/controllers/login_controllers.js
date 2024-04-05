@@ -2,6 +2,7 @@
 const Registro = require('../models/login.js');
 // Importamos sendMailToUser-sendMailToRecoveryPassword para poder enviar los respectivos correos
 const { sendMailToUser, sendMailToRecoveryPassword } = require('../config/nodemailer.js');
+const { verificado } = require('../helpers/autenticacion.js');
 
 const inicioLogin = async (req, res) => {
   // Desestructuramos el objeto req.body
@@ -12,6 +13,7 @@ const inicioLogin = async (req, res) => {
   try {
     // Buscamos el correo en la base de datos
     const user = await Registro.findOne({ email });
+    console.log(user)
     // Verificamos si existe el usuario
     if(!user) return res.status(404).json({msg:"Lo sentimos, el usuario no se encuentra registrado"})
     // Verificamos si ya confirmo la cuenta
@@ -27,6 +29,9 @@ const inicioLogin = async (req, res) => {
     else if (!contra) return res.status(500).json({ message : 'Contraseña incorrecto'})
     // En caso de que todo este en orden enviamos un mensaje
     else {
+      // Enviamos el id al arreglo
+      verificado.push(user.id)
+      // Enviamos un mensaje de que se autentico el usuario
       res.status(200).send('Usuario Autenticado Correctamente');
     }
   } catch (err) {

@@ -7,7 +7,8 @@ const {
     registrarFavorito,
     borrarFavorito
 } = require('../controllers/favoritos_controllers');
-
+// Importamos la autentificacion
+const { verificadoAutentication } = require('../helpers/autenticacion');
 
 // Importamos Router para crear el router de favoritos
 const routerFavoritos = express.Router();
@@ -16,16 +17,16 @@ const routerFavoritos = express.Router();
 routerFavoritos.use(express.json());
 
 // Ruta para ver todos los favoritos
-routerFavoritos.get('/listar', mostrarFavoritos);
+routerFavoritos.post('/listar', verificadoAutentication, mostrarFavoritos);
 
 // Ruta para buscar un favoritos
-routerFavoritos.get('/buscar/:id', buscarFavorito);
+routerFavoritos.post('/buscar/:id', verificadoAutentication, buscarFavorito);
 
 // Ruta para crear un nuevo favoritos
-routerFavoritos.post('/registro', registrarFavorito);
+routerFavoritos.post('/registro', verificadoAutentication, registrarFavorito);
 
 // Ruta para borrar un favoritos
-routerFavoritos.delete('/borrar/:id', borrarFavorito);
+routerFavoritos.post('/borrar/:id', verificadoAutentication, borrarFavorito);
 
 // Manejo de rutas en caso de que no sean encontradas
 routerFavoritos.use((req, res) => res.status(404).end());

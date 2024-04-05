@@ -19,7 +19,7 @@ const routerLogin = express.Router()
 // Hacemos que el router use archivos json
 routerLogin.use(express.json())
 
-// Ruta para iniciar session
+// Ruta para iniciar sesion
 routerLogin.post('/', inicioLogin)
 
 // Ruta para registrar un nuevo usuario
