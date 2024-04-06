@@ -15,6 +15,7 @@ const verificadoAutentication = (req, res, next) => {
   }
 }
 
+// Importamos la proteccion de las rutas y el arreglo
 module.exports = {
   verificadoAutentication,
   verificado

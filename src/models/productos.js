@@ -1,5 +1,7 @@
+// Importamos mongoose
 const mongoose = require("mongoose");
 
+// Creamos el modelo para mongo con los campos que se van a utilizar
 const productoSchema = new mongoose.Schema({
     _id : mongoose.Schema.Types.ObjectId,
     nombre : { type : String, required : true, unique : true, trim : true },
@@ -18,4 +20,5 @@ productoSchema.pre('save', function (next) {
     next();
   });
 
+// Exportamos el modelo
 module.exports = mongoose.model("Producto", productoSchema);

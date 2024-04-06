@@ -1,5 +1,7 @@
+// Importamos mongoose
 const mongoose = require("mongoose");
 
+// Creamos el modelo para mongo con los campos que se van a utilizar
 const favoritoSchema = new mongoose.Schema({
     _id : mongoose.Schema.Types.ObjectId,
     producto : {
@@ -49,4 +51,5 @@ favoritoSchema.pre('save', function (next) {
     next();
   });
 
+// Exportamos el modelo
 module.exports = mongoose.model("Favorito", favoritoSchema);

@@ -6,6 +6,7 @@ const mongoose = require('mongoose');
 // Especificamos el número de rondas de generación de salt
 const saltRounds = 10;
 
+// Creamos el modelo para mongo con los campos que se van a utilizar
 const RegistroSchema = new mongoose.Schema({
   username : { type : String, required : true },
   password : { type : String, required : true },
@@ -55,5 +56,5 @@ RegistroSchema.methods.crearToken = function () {
     return tokenGenerado;
 }
 
-// Con model se crea el nombre de la coleccion del mongo
+// Exportamos el modelo
 module.exports = mongoose.model('Registro', RegistroSchema);
