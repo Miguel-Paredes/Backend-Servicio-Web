@@ -2,6 +2,7 @@
 const Registro = require('../models/login.js');
 // Importamos sendMailToUser-sendMailToRecoveryPassword para poder enviar los respectivos correos
 const { sendMailToUser, sendMailToRecoveryPassword } = require('../config/nodemailer.js');
+// Importamos el arreglo
 const { verificado } = require('../helpers/autenticacion.js');
 
 const inicioLogin = async (req, res) => {

@@ -1,7 +1,12 @@
+// Importamos el modelo Producto
 const Producto = require ('../models/productos.js')
+// Importamos fs
 const fs = require ('fs-extra')
+// Importamos deleteImage uploadImage
 const { deleteImage, uploadImage } = require ("../config/cloudinary.js")
+// Importamos mongoose
 const mongoose = require ('mongoose');
+// Importamos los controladores de favoritos para actualizar y eliminar y/o productos
 const { actualizarFavorito, eliminarFavorito } = require('./favoritos_controllers.js');
 
 const mostrarProductos = async (req, res) => {
@@ -191,7 +196,9 @@ const borrarProducto = async (req, res) => {
 
 const categoriaProducto = async (req, res) => {
     // Obtenemos el valor de categoria de la url
-    const categoria = req.params.id
+    let categoria = req.params.id
+    // Hacemos que el valor de la busqueda este en todo mayusculas
+    categoria = categoria.toUpperCase()
     try{
         // Buscamos en la base de datos ese Producto
         const productoCategoria = await Producto.find({ categoria })

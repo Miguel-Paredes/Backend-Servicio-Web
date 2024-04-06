@@ -23,7 +23,7 @@ routerProductos.get('/listar', mostrarProductos);
 routerProductos.get('/buscar/:id', buscarProducto);
 
 // Ruta para buscar productos por categoria
-routerProductos.post('/categoria/:id', categoriaProducto)
+routerProductos.get('/categoria/:id', categoriaProducto)
 
 // Ruta para crear un nuevo producto
 routerProductos.post('/registro', registrarProducto);
