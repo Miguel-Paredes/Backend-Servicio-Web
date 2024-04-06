@@ -4,6 +4,8 @@ const Registro = require('../models/login.js');
 const { sendMailToUser, sendMailToRecoveryPassword } = require('../config/nodemailer.js');
 // Importamos el arreglo
 const { verificado } = require('../helpers/autenticacion.js');
+// Creamos una variable global
+let inicioAdministrador = false;
 
 const inicioLogin = async (req, res) => {
   // Desestructuramos el objeto req.body
@@ -14,26 +16,36 @@ const inicioLogin = async (req, res) => {
   try {
     // Buscamos el correo en la base de datos
     const user = await Registro.findOne({ email });
-    console.log(user)
-    // Verificamos si existe el usuario
-    if(!user) return res.status(404).json({msg:"Lo sentimos, el usuario no se encuentra registrado"})
-    // Verificamos si ya confirmo la cuenta
-    if(user?.confirmEmail===false) return res.status(403).json({msg:"Lo sentimos, debe verificar su cuenta"})
-    // Desincriptamos la contraseña
-    const contra = await user.isCorrectPassword(password)
-    // Creamos condicionales para verificar el el correo y la contraseña
-    // En caso de que el usuario y la contraseña sean incorrectos indicamos enviamos un mensaje
-    if (!user && !contra) return res.status(500).json({ message : 'Correo y/o contraseña incorrectos'})
-    // En caso de que el usuario sea incorrecto indicamos enviamos un mensaje
-    else if (!user) return res.status(500).json({ message : 'Correo incorrecto'})
-    // En caso de que la contraseña sea incorrecta indicamos enviamos un mensaje
-    else if (!contra) return res.status(500).json({ message : 'Contraseña incorrecto'})
-    // En caso de que todo este en orden enviamos un mensaje
-    else {
-      // Enviamos el id al arreglo
-      verificado.push(user.id)
-      // Enviamos un mensaje de que se autentico el usuario
-      res.status(200).send('Usuario Autenticado Correctamente');
+    // Buscamos en el arreglo si el usuario ya inicio sesion
+    const sesion = verificado.find( cliente => cliente === user.id)
+    // En caso de que haya iniciado sesion enviamos un mensaje
+    if(sesion == user.id) return res.json({ message : 'El usuario ya inicio sesion'})
+    // En caso de que el administrador ya haya iniciado sesion
+    else if(user.email == 'admin' && inicioAdministrador == true) return res.json({ message : 'El administrador ya inicio sesion'})
+    else{
+      console.log(user)
+      // Verificamos si existe el usuario
+      if(!user) return res.status(404).json({msg:'Lo sentimos, el usuario no se encuentra registrado'})
+      // Verificamos si ya confirmo la cuenta
+      if(user?.confirmEmail===false) return res.status(403).json({msg:'Lo sentimos, debe verificar su cuenta'})
+      // Desincriptamos la contraseña
+      const contra = await user.isCorrectPassword(password)
+      // Creamos condicionales para verificar el el correo y la contraseña
+      // En caso de que el usuario y la contraseña sean incorrectos indicamos enviamos un mensaje
+      if (!user && !contra) return res.status(500).json({ message : 'Correo y/o contraseña incorrectos'})
+      // En caso de que el usuario sea incorrecto indicamos enviamos un mensaje
+      else if (!user) return res.status(500).json({ message : 'Correo incorrecto'})
+      // En caso de que la contraseña sea incorrecta indicamos enviamos un mensaje
+      else if (!contra) return res.status(500).json({ message : 'Contraseña incorrecto'})
+      // En caso de que todo este en orden enviamos un mensaje
+      else {
+        // Verficamos que si el administrador quiere iniciar sesion
+        if(user.email == 'admin') { inicioAdministrador = true }
+        // En caso de que sea otro usuario enviamos el id al arreglo
+        else { verificado.push(user.id) }
+        // Enviamos un mensaje de que se autentico el usuario
+        res.status(200).send('Usuario Autenticado Correctamente');
+      }
     }
   } catch (err) {
     // Enviamos un mensaje de error en caso de que no se pueda autenticar el usuario
@@ -75,11 +87,11 @@ const registroLogin = async (req, res) => {
 const confirmEmail = async (req, res) => {
   const token = req.params.token
   // Verifica si no se proporcionó un token en los parámetros de la solicitud
-  if (!(req.params.token)) return res.status(400).json({ msg: "Lo sentimos, no se puede validar la cuenta" });
+  if (!(req.params.token)) return res.status(400).json({ msg: 'Lo sentimos, no se puede validar la cuenta' });
   // Busca en la base de datos un registro con el token proporcionado
   const user = await Registro.findOne({ token: req.params.token });
   // Verifica si el usuario no existe o si el campo token no está definido
-  if (!user?.token) return res.status(404).json({ msg: "La cuenta ya ha sido confirmada" });
+  if (!user?.token) return res.status(404).json({ msg: 'La cuenta ya ha sido confirmada' });
   // Establece el campo token en null para indicar que el token ha sido utilizado
   user.token = null;
   // Establece el campo confirmEmail en true para indicar que la cuenta ha sido confirmada
@@ -145,6 +157,54 @@ const nuevoPassword = async (req, res) => {
   res.status(200).json({ msg: 'Felicitaciones, ya puedes iniciar sesión con tu nuevo password' });
 };
 
+const administrador = async (req, res) => {
+  // Creamos las credenciales para el administrador
+  const username = 'admin';
+  const password = 'admin';
+  const email = 'admin';
+  const confirmEmail = true;
+  try {
+    // Buscamos si ya hay el usuario del administrador
+    const buscarUsername = await Registro.find({ username });
+    // En caso de que no este creada le creamos
+    if (buscarUsername.length === 0) {
+      const user = new Registro({ username, password, email, confirmEmail });
+      await user.save();
+    }
+  } catch (error) {
+    // Indicamos si hay un error al crear al usuario del administrador
+    console.log('Error al crear el usuario del administrador', error);
+  }
+};
+
+const cierreSesionLogin = async (req, res) => {
+  // Almacenamos el email del usuario para poder cerrar sesión
+  const email = req.body.email;
+  try {
+    // Verificamos si el administrador quiere cerrar sesión
+    if (email === 'admin') {
+      inicioAdministrador = false;
+      console.log('Se cerro la sesion del administrador')
+    } else {
+      // En caso de que sea un usuario
+      // Buscamos el usuario en la base de datos
+      const cierreUsuario = await Registro.findOne({ email: email });
+      // Almacenamos la posición del id del usuario en el arreglo
+      const index = verificado.findIndex(cliente => cliente === String(cierreUsuario._id));
+      // Eliminamos el inicio de sesión del usuario
+      if (index !== -1) { verificado.splice(index, 1); }
+      console.log('Se cerro la sesion del usuario')
+    }
+    // Redireccionamos al login
+    res.redirect(`${process.env.URL}/login`);
+  } catch (err) {
+    // En caso de haber un error, indicamos que no se pudo cerrar la sesión del usuario
+    res.status(500).json({ message: 'Error al cerrar la sesión del usuario' });
+    // Mostramos el error
+    console.log(err);
+  }
+};
+
 // Exportamos los controladores
 module.exports = {
     inicioLogin,
@@ -152,5 +212,8 @@ module.exports = {
     confirmEmail,
     recuperarPassword,
     comprobarTokenPasword,
-    nuevoPassword
+    nuevoPassword,
+    administrador,
+    cierreSesionLogin,
+    inicioAdministrador
 };

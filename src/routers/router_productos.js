@@ -9,6 +9,7 @@ const {
     mostrarProductos,
     registrarProducto
 } = require('../controllers/productos_controllers.js');
+const { verificadoAdministrador } = require('../helpers/permiso_admin.js');
 
 // Importamos Router para crear el router de productos
 const routerProductos = express.Router();
@@ -17,7 +18,7 @@ const routerProductos = express.Router();
 routerProductos.use(express.json());
 
 // Ruta para ver todos los productos
-routerProductos.get('/listar', mostrarProductos);
+routerProductos.get('/listar', verificadoAdministrador, mostrarProductos);
 
 // Ruta para buscar un producto
 routerProductos.get('/buscar/:id', buscarProducto);
@@ -26,13 +27,13 @@ routerProductos.get('/buscar/:id', buscarProducto);
 routerProductos.get('/categoria/:id', categoriaProducto)
 
 // Ruta para crear un nuevo producto
-routerProductos.post('/registro', registrarProducto);
+routerProductos.post('/registro', verificadoAdministrador, registrarProducto);
 
 // Ruta para actualizar un producto
-routerProductos.put('/actualizar/:id', actualizarProducto);
+routerProductos.put('/actualizar/:id', verificadoAdministrador, actualizarProducto);
 
 // Ruta para borrar un producto
-routerProductos.delete('/borrar/:id', borrarProducto);
+routerProductos.delete('/borrar/:id', verificadoAdministrador, borrarProducto);
 
 // Manejo de rutas en caso de que no sean encontradas
 routerProductos.use((req, res) => res.status(404).end());
