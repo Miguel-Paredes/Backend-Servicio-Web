@@ -5,10 +5,14 @@ const mongoose = require("mongoose");
 const productoSchema = new mongoose.Schema({
     _id : mongoose.Schema.Types.ObjectId,
     nombre : { type : String, required : true, unique : true, trim : true },
-    cantidad : { type : Number, required : true, trim : true },
     precio : { type : Number, required : true, trim : true },
     descripcion : { type : String, trim : true },
-    categoria : { type : String, trim : true },
+    categoria : { 
+      type : mongoose.Schema.Types.String,
+      ref : 'Categoria',
+      require : true,
+      trim : true
+     },
     imagen : { public_id : String, secure_url : String}
 });
 

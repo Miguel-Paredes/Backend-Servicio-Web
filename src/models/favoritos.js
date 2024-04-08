@@ -49,7 +49,7 @@ favoritoSchema.pre('save', function (next) {
     this.descripcion = this.descripcion.toUpperCase();
     this.categoria = this.categoria.toUpperCase();
     next();
-  });
+});
 
 // Exportamos el modelo
 module.exports = mongoose.model("Favorito", favoritoSchema);

@@ -23,7 +23,6 @@ const inicioLogin = async (req, res) => {
     // En caso de que el administrador ya haya iniciado sesion
     else if(user.email == 'admin' && inicioAdministrador == true) return res.json({ message : 'El administrador ya inicio sesion'})
     else{
-      console.log(user)
       // Verificamos si existe el usuario
       if(!user) return res.status(404).json({msg:'Lo sentimos, el usuario no se encuentra registrado'})
       // Verificamos si ya confirmo la cuenta

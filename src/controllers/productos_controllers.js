@@ -8,6 +8,8 @@ const { deleteImage, uploadImage } = require ("../config/cloudinary.js")
 const mongoose = require ('mongoose');
 // Importamos los controladores de favoritos para actualizar y eliminar y/o productos
 const { actualizarFavorito, eliminarFavorito } = require('./favoritos_controllers.js');
+// Importamos el modelo Categoria
+const Categoria = require('../models/categoria.js');
 
 const mostrarProductos = async (req, res) => {
     try {
@@ -56,34 +58,33 @@ const buscarProducto = async (req, res) => {
         // Mostramos los errores
         console.log(err)
     }
-}
+};
 
 const registrarProducto = async (req, res) => {
     // Desestructuramos el objeto req.body
-    // Extraemos las propiedades nombre, cantidad, precio, descripcion y categoria en variables separadas 
-    const { nombre, cantidad, precio, descripcion, categoria } = req.body
+    // Extraemos las propiedades nombre, precio, descripcion y categoria en variables separadas 
+    const { nombre, precio, descripcion } = req.body
+    let { categoria } = req.body
+    categoria = categoria.toUpperCase()
     // Validar todos los campos llenos
     if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
     try {
         // Buscamos si el nombre del Producto ya se encuentra registrado
         const exisNombre = await Producto.findOne({ nombre })
+        // Buscamos si la categoria del Producto existe
+        const exisCategoria = await Categoria.findOne({ categoria })
         // En caso de ya estar registrado enviamos un mensaje
         if(exisNombre) return res.json({ message : 'Ya existe un Producto con ese nombre'})
         // Colocamos condicionales para evitar que se ingresen numeros negativos
-        // En caso de que la cantidad sea menor a 1 y el precio menor a 0 enviamos un mensaje
-        if (cantidad < 0 && precio <= 0) return res.json({ message: 'La cantidad debe ser mayor a 1 y el precio debe ser mayor a 0' });
-        // En caso de que la cantidad sea menor a 1 enviamos un mensaje
-        else if (cantidad <= 0 ) return res.json({ message : 'La cantidad debe de ser mayor a 1'})
         // En caso de que el precio menor a 0 enviamos un mensaje
-        else if (precio <= 0) return res.json ({ message : 'El precio debe de ser mayor a 0'})
+        if(precio <= 0) return res.json ({ message : 'El precio debe de ser mayor a 0'})
+        if(!exisCategoria) return res.json({ message : 'No existe esa categoria' })
         // Creamos una nueva instancia 
         const nuevoProducto = new Producto({
             // Genera un nuevo ID para el Producto
             _id: new mongoose.Types.ObjectId,
             // Asignamos el valor de la variable nombre a la propiedad nombre
             nombre,
-            // Asignamos el valor de la variable cantidad a la propiedad cantidad
-            cantidad,
             // Asignamos el valor de la variable precio a la propiedad precio
             precio,
             // Asignamos el valor de la variable descripcion a la propiedad descripcion
@@ -112,31 +113,30 @@ const registrarProducto = async (req, res) => {
         // Mostramos los errores
         console.log(err)
     }
-}
+};
 
 const actualizarProducto = async (req, res) => {
     // Obtenemos el valor de id de la url
     const ProductoId = req.params.id
     // Desestructuramos el objeto req.body
-    // Extraemos las propiedades nombre, cantidad, precio, descripcion y categoria en variables separadas 
-    const { nombre, cantidad, precio, descripcion, categoria, imagen } = req.body
+    // Extraemos las propiedades nombre, precio, descripcion y categoria en variables separadas 
+    const { nombre, precio, descripcion, categoria, imagen } = req.body
     // Validar todos los campos llenos
     if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
     try{
+        // Buscamos el producto por el id
         let ProductoActualizado = await Producto.findById( ProductoId )
+        // Buscamos si la categoria del Producto existe
+        const exisCategoria = await Categoria.findOne({ categoria })
         if(!ProductoActualizado) return res.status(404).json({ message : 'No se encontro el Producto para actualizar'})
         // Colocamos condicionales para evitar que se ingresen numeros negativos
-        // En caso de que la cantidad sea menor a 1 y el precio menor a 0 enviamos un mensaje
-        if (cantidad < 0 && precio <= 0) return res.json({ message: 'La cantidad debe ser mayor a 1 y el precio debe ser mayor a 0' });
-        // En caso de que la cantidad sea menor a 1 enviamos un mensaje
-        else if (cantidad <= 0 ) return res.json({ message : 'La cantidad debe de ser mayor a 1'})
         // En caso de que el precio menor a 0 enviamos un mensaje
         else if (precio <= 0) return res.json ({ message : 'El precio debe de ser mayor a 0'})
+        else if (!exisCategoria) return res.json({ message : 'No existe esa categoria' })
         ProductoActualizado = await Producto.findByIdAndUpdate(
             ProductoId,
             {
                 nombre,
-                cantidad,
                 precio,
                 descripcion,
                 categoria
@@ -169,7 +169,7 @@ const actualizarProducto = async (req, res) => {
         // Mostramos los errores
         console.log(err)
     }
-}
+};
 
 const borrarProducto = async (req, res) => {
     // Obtenemos el valor de id de la URL
@@ -220,7 +220,34 @@ const categoriaProducto = async (req, res) => {
         // Mostramos los errores
         console.log(err);
     }
-}
+};
+
+const actualizarCategoriaProducto = async (CategoriaId, categoria) => {
+    try{
+        // Buscamos todos los productos con esa categoria
+        const producto = await Producto.find({ CategoriaId })
+        // En caso de que no existan productos con esa categoria
+        if(producto.length === 0 || !producto) return console.log('No existen productos con esa categoria')
+        // En caso de que si existan
+        else {
+            // Actualizamos la categoria en cada producto
+            for (let i = 0 ; i < producto.length ; i++){
+                await Producto.findByIdAndUpdate(
+                    producto[i].id,
+                    { categoria: categoria },
+                    { new: true }
+                )
+            }
+            // Enviamos un mensaje a consola indicando que ya se actualizaron todos los productos
+            console.log('Categoria de productos actualizados')
+        }
+    } catch (err) {
+        // Enviamos un mensaje de error en caso de que no se pueda actualizar la categoria
+        console.log({ message: 'Error al actualizar la categoria de los productos' });
+        // Mostramos los errores
+        console.log(err);
+    }
+};
 
 // Exportamos los controladores
 module.exports = {
@@ -229,5 +256,6 @@ module.exports = {
     registrarProducto,
     actualizarProducto,
     borrarProducto,
-    categoriaProducto
+    categoriaProducto,
+    actualizarCategoriaProducto
 }

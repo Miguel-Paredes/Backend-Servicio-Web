@@ -6,6 +6,8 @@ const Producto = require ('../models/productos.js')
 const Registro = require ('../models/login.js')
 // Importamos moongose
 const mongoose = require ('mongoose')
+// Importamos el modelo Categoria
+const Categoria = require('../models/categoria.js');
 
 const mostrarFavoritos = async (req, res) => {
     try {
@@ -54,7 +56,7 @@ const buscarFavorito = async (req, res) => {
         // Mostramos los errores
         console.log(err)
     }
-}
+};
 
 const registrarFavorito = async (req, res) => {
     try {
@@ -91,7 +93,7 @@ const registrarFavorito = async (req, res) => {
         // Mostramos los errores
         console.log(err);
     }
-}
+};
 
 const actualizarFavorito = async (productoId) => {
     try {
@@ -135,7 +137,7 @@ const actualizarFavorito = async (productoId) => {
         // Mostramos los errores
         console.log(err);
     }
-}
+};
 
 const borrarFavorito = async (req, res) => {
     // Obtenemos el valor de id de la URL
@@ -180,7 +182,33 @@ const eliminarFavorito = async (productoId) => {
         // Mostramos los errores
         console.log(err)
     }
-}
+};
+
+const actualizarCategoriaFavorito = async (CategoriaId, categoria) => {
+    try{
+        // Buscamos todos los productos con esa categoria
+        const favorito = await Favorito.find({ CategoriaId })
+        // En caso de que no existan productos con esa categoria
+        if(favorito.length === 0 || !favorito) return console.log('No existen productos favoritos con esa categoria')
+        else{
+            // Actualizamos la categoria en cada producto
+            for (let i = 0 ; i < favorito.length ; i++){
+                await Favorito.findByIdAndUpdate(
+                    favorito[i].id,
+                    { categoria: categoria },
+                    { new: true }
+                )
+            }
+            // Enviamos un mensaje a consola indicando que ya se actualizaron todos los productos
+            console.log('Categoria de productos favoritos actualizados')
+        }
+    } catch (err) {
+        // Enviamos un mensaje de error en caso de que no se pueda actualizar la categoria
+        console.log({ message: 'Error al actualizar la categoria de los productos favoritos' });
+        // Mostramos los errores
+        console.log(err);
+    }
+};
 
 // Exportamos los controladores
 module.exports = {
@@ -189,5 +217,6 @@ module.exports = {
     registrarFavorito,
     actualizarFavorito,
     borrarFavorito,
-    eliminarFavorito
+    eliminarFavorito,
+    actualizarCategoriaFavorito
 }
