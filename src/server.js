@@ -13,7 +13,10 @@
     const routerFavoritos = require('./routers/router_favoritos.js')
     // Importamos routerLogin para manejar las solicitudes a la ruta /api/login
     const routerLogin = require('./routers/router_login.js')
-const routerCategoria = require('./routers/router_categoria.js')
+    // Importamos routerLogin para manejar las solicitudes a la ruta /api/categoria
+    const routerCategoria = require('./routers/router_categoria.js')
+    // Importamos routerLogin para manejar las solicitudes a la ruta /api/pedidos
+    const routerPedidos = require('./routers/router_pedidos.js')
 
 // Inicializaciones
     // Creamos una variable que nos permita usar express
@@ -46,6 +49,8 @@ const routerCategoria = require('./routers/router_categoria.js')
     app.use('/api/login', routerLogin)
     // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/categoria
     app.use('/api/categoria', routerCategoria)
+    // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/pedidos
+    app.use('/api/pedidos', routerPedidos)
 
     // Manejo de rutas en caso de que no sean encontradas
     app.use((req, res) => res.status(404).end())

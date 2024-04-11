@@ -1,4 +1,4 @@
-// Importamos expres
+// Importamos express
 const express = require('express');
 // Importamos la proteccion de rutas del administrador
 const { verificadoAdministrador } = require('../helpers/permiso_admin');

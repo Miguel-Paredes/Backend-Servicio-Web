@@ -125,7 +125,7 @@ const borrarCategoria = async (req, res) => {
         let categoriaEliminado = await Categoria.findByIdAndDelete(CategoriaId);
         if (!categoriaEliminado) return res.status(404).json({ message: 'No se encontró la Categoria para borrar' });
         // Enviamos un mensaje indicando que se borró el Producto
-        res.status(200).json({ message: 'Caregoria borrada' });
+        res.status(200).json({ message: 'Categoria borrada' });
     } catch (err) {
         // Enviamos un mensaje de error en caso de que no se pueda borrar el Producto
         res.status(500).json({ message: 'Error al borrar la Categoria' });

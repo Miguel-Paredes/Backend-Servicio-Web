@@ -13,4 +13,5 @@ categoriaSchema.pre('save', function (next) {
     next();
 });
 
+// Exportamos el modelo
 module.exports = mongoose.model('Categoria', categoriaSchema)

@@ -65,7 +65,7 @@ const sendMailToRecoveryPassword = async(userMail,token)=>{
      // Destinatario del correo
     to: userMail,
      // Asunto del correo
-    subject: "Correo para reestablecer tu contraseña",
+    subject: "Correo para restablecer tu contraseña",
     html: `
     <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; display: flex; justify-content: center; align-items: center; margin-top: 20px; width: 100%;">
         <div style="max-width: 90%; padding: 2rem; text-align: center; border: 1px solid #dddddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">

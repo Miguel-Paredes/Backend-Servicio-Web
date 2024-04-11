@@ -19,7 +19,7 @@ const inicioLogin = async (req, res) => {
     // Buscamos en el arreglo si el usuario ya inicio sesion
     const sesion = verificado.find( cliente => cliente === user.id)
     // En caso de que haya iniciado sesion enviamos un mensaje
-    if(sesion == user.id) return res.json({ message : 'El usuario ya inicio sesion'})
+    if(sesion == user.id) return res.json({ message : 'El usuario ya inicio sesión'})
     // En caso de que el administrador ya haya iniciado sesion
     else if(user.email == 'admin' && inicioAdministrador == true) return res.json({ message : 'El administrador ya inicio sesion'})
     else{
@@ -38,7 +38,7 @@ const inicioLogin = async (req, res) => {
       else if (!contra) return res.status(500).json({ message : 'Contraseña incorrecto'})
       // En caso de que todo este en orden enviamos un mensaje
       else {
-        // Verficamos que si el administrador quiere iniciar sesion
+        // Verificamos que si el administrador quiere iniciar sesion
         if(user.email == 'admin') { inicioAdministrador = true }
         // En caso de que sea otro usuario enviamos el id al arreglo
         else { verificado.push(user.id) }
@@ -56,7 +56,7 @@ const inicioLogin = async (req, res) => {
 
 const registroLogin = async (req, res) => {
   // Desestructuramos el objeto req.body
-  // Extraemo la propiedad email en una variable 
+  // Extraemos la propiedad email en una variable 
   const { email } = req.body;
   try {
     // Validar todos los campos llenos
@@ -119,7 +119,7 @@ const recuperarPassword = async (req, res) => {
   // Guarda los cambios realizados en el objeto user en la base de datos
   await user.save();
   // Enviamos una respuesta de éxito con un mensaje indicando que se debe revisar el correo electrónico
-  res.status(200).json({ msg: 'Revisa tu correo electrónico para reestablecer tu cuenta' });
+  res.status(200).json({ msg: 'Revisa tu correo electrónico para restablecer tu cuenta' });
 };
 
 const comprobarTokenPasword = async (req, res) => {
