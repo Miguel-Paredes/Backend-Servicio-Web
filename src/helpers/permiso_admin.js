@@ -1,10 +1,15 @@
-// Importamos la variable 
-const inicioAdministrador = require('../controllers/login_controllers.js')
+// Creamos una variable 
+let sesion = false
+
+// Creamos una funcion que verifica si el administrador inicio sesion o no
+const verifAdministrador = (inicioAdministrador) => {
+  sesion = inicioAdministrador
+}
 
 // Metodo para proteger las rutas del administrador
 const verificadoAdministrador = (req, res, next) => {
   // Si existe un inicio de sesion del administrador
-  if(inicioAdministrador  == true){
+  if(sesion  == true){
     // Continuar
     return next();
   }else{
@@ -15,5 +20,6 @@ const verificadoAdministrador = (req, res, next) => {
 
 // Exportamos la proteccion de las rutas del administrador
 module.exports = {
-  verificadoAdministrador
+  verificadoAdministrador,
+  verifAdministrador
 }

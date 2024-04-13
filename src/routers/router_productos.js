@@ -19,7 +19,7 @@ const routerProductos = express.Router();
 routerProductos.use(express.json());
 
 // Ruta para ver todos los productos
-routerProductos.get('/listar', verificadoAdministrador, mostrarProductos);
+routerProductos.get('/listar', mostrarProductos);
 
 // Ruta para buscar un producto
 routerProductos.get('/buscar/:id', buscarProducto);

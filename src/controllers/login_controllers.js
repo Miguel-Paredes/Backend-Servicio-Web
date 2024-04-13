@@ -6,6 +6,7 @@ const { sendMailToUser, sendMailToRecoveryPassword } = require('../config/nodema
 const { verificado } = require('../helpers/autenticacion.js');
 // Creamos una variable global
 let inicioAdministrador = false;
+const { verifAdministrador } = require('../helpers/permiso_admin.js')
 
 const inicioLogin = async (req, res) => {
   // Desestructuramos el objeto req.body
@@ -39,7 +40,12 @@ const inicioLogin = async (req, res) => {
       // En caso de que todo este en orden enviamos un mensaje
       else {
         // Verificamos que si el administrador quiere iniciar sesion
-        if(user.email == 'admin') { inicioAdministrador = true }
+        if(user.email == 'admin') { 
+          // Cambiamos el valor de la variable a true
+          inicioAdministrador = true
+          // Enviamos a la funcion indicando que el administrador inicio sesion
+          verifAdministrador(inicioAdministrador);
+        }
         // En caso de que sea otro usuario enviamos el id al arreglo
         else { verificado.push(user.id) }
         // Enviamos un mensaje de que se autentico el usuario
@@ -182,7 +188,10 @@ const cierreSesionLogin = async (req, res) => {
   try {
     // Verificamos si el administrador quiere cerrar sesión
     if (email === 'admin') {
+      // Cambiamos el valor de la variable a false
       inicioAdministrador = false;
+      // Enviamos a la funcion el cierre de sesion del administrador
+      verifAdministrador(inicioAdministrador);
       console.log('Se cerro la sesion del administrador')
     } else {
       // En caso de que sea un usuario
@@ -213,6 +222,5 @@ module.exports = {
     comprobarTokenPasword,
     nuevoPassword,
     administrador,
-    cierreSesionLogin,
-    inicioAdministrador
+    cierreSesionLogin
 };
