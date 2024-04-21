@@ -1,5 +1,16 @@
 // Importamos express
 const express = require('express');
+const {
+    mostrarPedidos,
+    buscarPedido,
+    registroPedido,
+    listarProductosPedido,
+    agregarProductoPedido,
+    borrarProductoPedido,
+    actualizarProductoPedido,
+    eliminarPedido,
+    json
+} = require('../controllers/pedidos_controllers');
 
 // Importamos Router para crear el router de pedidos
 const routerPedidos = express.Router();
@@ -8,28 +19,28 @@ const routerPedidos = express.Router();
 routerPedidos.use(express.json());
 
 // Ruta para ver todos los pedidos realizados
-routerPedidos.post('/mostrar', (req, res) => res.json({ message : 'Mostrar todos los pedidos'}));
+routerPedidos.post('/mostrar', mostrarPedidos);
 
 // Ruta para ver buscar un pedido realizado
-routerPedidos.post('/buscar/:id', (req, res) => res.json({ message : 'Buscar un pedido'}));
+routerPedidos.post('/buscar/:id', buscarPedido);
 
 // Ruta para registrar el pedido
-routerPedidos.post('/registro', (req, res) => res.json({ message : 'Registrar el pedido'}));
+routerPedidos.post('/registro', registroPedido);
 
 // Ruta para ver todos los productos del pedido
-routerPedidos.post('/listar', (req, res) => res.json({ message : 'Mostrar todos los productos del pedido'}));
+routerPedidos.post('/listar', listarProductosPedido);
 
 // Ruta para agregar un producto al pedido
-routerPedidos.post('/agregar', (req, res) => res.json({ message : 'Agregar producto'}));
+routerPedidos.post('/agregar', agregarProductoPedido);
 
 // Ruta para borrar un producto del pedido
-routerPedidos.post('/borrar/:id', (req, res) => res.json({ message : 'Borrar producto'}));
+routerPedidos.post('/borrar/:id', borrarProductoPedido);
 
 // Ruta para actualizar algun producto del pedido
-routerPedidos.post('/actualizar/:id', (req, res) => res.json({ message : 'Actualizar producto'}));
+routerPedidos.post('/actualizar/:id', actualizarProductoPedido);
 
 // Ruta para eliminar todo el pedido
-routerPedidos.post('/eliminar/:id', (req, res) => res.json({ message : 'Pedido eliminado'}));
+routerPedidos.post('/eliminar', eliminarPedido);
 
 // Exportamos routerPedidos
 module.exports = routerPedidos
