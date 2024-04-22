@@ -8,8 +8,7 @@ const {
     agregarProductoPedido,
     borrarProductoPedido,
     actualizarProductoPedido,
-    eliminarPedido,
-    json
+    eliminarPedido
 } = require('../controllers/pedidos_controllers');
 
 // Importamos Router para crear el router de pedidos

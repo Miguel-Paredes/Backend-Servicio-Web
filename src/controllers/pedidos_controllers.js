@@ -17,6 +17,8 @@ const agregarProductoPedido = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades cliente producto y cantidad en variables separadas 
     const { cliente, producto, cantidad } = req.body
+    // Validar todos los campos llenos
+    if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
     // Verificamos si se quiere ingresar una cantidad menor a 0
     if(cantidad < 0) return res.json({ message : 'No se puede ingresar una cantidad negativa'})
     // Verificamos si se quiere ingresar una cantidad mayor a 20
@@ -94,6 +96,8 @@ const actualizarProductoPedido = async (req, res) => {
     const { cliente, cantidad } = req.body
     // Extraemos el id del producto de la url
     const producto = req.params.id
+    // Validar todos los campos llenos
+    if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
     // Verificamos si se quiere ingresar una cantidad menor a 0
     if(cantidad < 0) return res.json({ message : 'No se puede ingresar una cantidad negativa'})
     // Verificamos si se quiere ingresar una cantidad mayor a 20
@@ -145,6 +149,8 @@ const borrarProductoPedido = async (req, res) => {
     const cliente = req.body.cliente
     // Extraemos el id del producto de la url
     const producto = req.params.id
+    // Validar todos los campos llenos
+    if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
     try{
         // Buscamos el producto en la base de datos
         const busProducto = await Producto.findById( producto )
@@ -182,8 +188,10 @@ const borrarProductoPedido = async (req, res) => {
 
 const eliminarPedido = async (req, res) => {
     // Desestructuramos el objeto req.body
-    // Extraemos las propiedades clientes y productos en variables separadas
+    // Extraemos las propiedades clientes en una variable
     const cliente = req.body.cliente
+    // Validar todos los campos llenos
+    if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
     try{
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
@@ -206,7 +214,11 @@ const eliminarPedido = async (req, res) => {
 }
 
 const listarProductosPedido = async (req, res) => {
+    // Desestructuramos el objeto req.body
+    // Extraemos las propiedades clientes en una variable
     const cliente = req.body.cliente
+    // Validar todos los campos llenos
+    if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
     // Revisamos si el cliente ha agregado algun producto al pedido
     if(!almacen.hasOwnProperty(cliente)) return res.json({ message : 'No has agregado ningun producto al pedido'})
     try{
@@ -214,10 +226,31 @@ const listarProductosPedido = async (req, res) => {
         const busCliente = await Registro.findById( cliente )
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
+        // Buscamos el cliente por medio de un bucle
         for (busc in almacen){
+            // En caso de que lo encontremos
             if(busc == cliente){
+                // Creamos un nuevo json
+                products = {}
+                // Un nuevo arreglo
+                products[busc] = []
+                for(i = 0 ; i < almacen[busc].length ; i++){
+                    // Extraemos la informacion del pedido
+                    const product = Object(almacen[busc][i])
+                    // Extraemos de manera indivual la cantidad producto y precio
+                    const cantidad = product.Cantidad
+                    const precio = product.Precio
+                    // Convertimos la primera letra del producto en mayuscula y el resto en minuscula
+                    const producto = product.Producto.charAt(0).toUpperCase() + product.Producto.slice(1).toLowerCase()
+                    // Subimos la nueva informacion al nuevo arreglo
+                    products[busc].push({
+                        "Producto" : producto,
+                        "Cantidad" : cantidad,
+                        "Precio" : precio
+                    })
+                }
                 // Mostramos todos los productos del pedido
-                res.json(almacen[busc])
+                res.json(products[busc])
                 // Si se encontro el cliente detenemos el bucle
                 break
             }
@@ -234,6 +267,8 @@ const mostrarPedidos = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades cliente en una variable
     const cliente = req.body.cliente
+    // Validar todos los campos llenos
+    if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
     try{
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
@@ -243,6 +278,7 @@ const mostrarPedidos = async (req, res) => {
         const Pedidos = await Pedido.find({ cliente : cliente })
         // En caso de que no existan Pedidos realizados previamente
         if (!Pedidos || Pedidos.length === 0) return res.json({ message: 'No existen Pedidos realizados previamente' });
+        // Convertimos la primera letra en mayuscula y el resto en minuscula de los nombres de los productos
         const listarPedidos = Pedidos.map(pedido => {
             const productosFormateados = pedido.producto.map(producto => {
               const nombreProducto = producto.charAt(0).toUpperCase() + producto.slice(1).toLowerCase();
@@ -266,17 +302,27 @@ const buscarPedido = async (req, res) => {
     const cliente = req.body.cliente
     // Extraemos la id de la url
     const PedidoId = req.params.id
+    // Validar todos los campos llenos
+    if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
     try{
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
         // Buscamos en la base de datos todos los pedidos del cliente
-        const Pedidos = await Pedido.find({ _id : PedidoId, cliente : cliente })
+        const Pedidos = await Pedido.find({ _id : PedidoId})
         // En caso de que no exista ese Favorito enviamos un mensaje
         if (!Pedidos || Pedidos.length === 0) return res.json({ message: 'No existe ese Pedido del Cliente' });
-        // Mostramos el Pedidos del cliente
-        res.status(200).json(Pedidos);
+        // Convertimos la primera letra en mayuscula y el resto en minuscula de los nombres de los productos
+        const listarPedidos = Pedidos.map(pedido => {
+            const productosFormateados = pedido.producto.map(producto => {
+              const nombreProducto = producto.charAt(0).toUpperCase() + producto.slice(1).toLowerCase();
+              return nombreProducto;
+            });
+            return { ...pedido.toObject(), producto: productosFormateados };
+          });
+        // Mostramos todos los Pedidos del cliente
+        res.status(200).json(listarPedidos);
     }catch(err){
         // Enviamos un mensaje en caso de que no se pudo buscar el pedido
         res.status(500).json({ message : 'Error al buscar el pedido del cliente' })
@@ -290,6 +336,8 @@ const registroPedido = async (req, res) => {
     // Extraemos las propiedades cliente y comision en variables separadas
     const cliente = req.body.cliente
     let comision = req.body.comision
+    // Validar todos los campos llenos
+    if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
     // Revisamos si el cliente ha agregado algun producto al pedido
     if(!almacen.hasOwnProperty(cliente)) return res.json({ message : 'No has agregado ningun producto al pedido'})
     // Creamos variables temporales que nos serviran para poder hacer calculos
