@@ -23,6 +23,7 @@ const agregarProductoPedido = async (req, res) => {
     if(cantidad < 0) return res.json({ message : 'No se puede ingresar una cantidad negativa'})
     // Verificamos si se quiere ingresar una cantidad mayor a 20
     else if(cantidad > 20) return res.json({ message : 'La cantidad maxima es de 20'})
+    let productoAgregado = {}
     try{
         // Buscamos el producto en la base de datos
         const busProducto = await Producto.findById( producto )
@@ -81,7 +82,12 @@ const agregarProductoPedido = async (req, res) => {
             // Volvemos a colocar el booleano en false
             pedidoCliente = false
         }
-        res.json({ message : 'Producto agregado' })
+        productoAgregado = {
+            'Producto' : busProducto.nombre.charAt(0).toUpperCase() + busProducto.nombre.slice(1).toLowerCase(),
+            'Precio' : busProducto.precio,
+            'Cantidad' : cantidad
+        }
+        res.json({ message : 'Producto agregado', Producto : productoAgregado})
     }catch(err){
         // Enviamos un mensaje en caso de que no se pudo agregar el producto al pedido
         res.status(500).json({ message : 'Error al agregar el producto al pedido' })
@@ -102,6 +108,7 @@ const actualizarProductoPedido = async (req, res) => {
     if(cantidad < 0) return res.json({ message : 'No se puede ingresar una cantidad negativa'})
     // Verificamos si se quiere ingresar una cantidad mayor a 20
     else if(cantidad > 20) return res.json({ message : 'La cantidad maxima es de 20'})
+    let productoActualizado = {}
     try{
         // Buscamos el producto en la base de datos
         const busProducto = await Producto.findById( producto )
@@ -123,15 +130,28 @@ const actualizarProductoPedido = async (req, res) => {
         }
         // Verificamos si se encuentra el cliente
         if(actupedidoCliente == true){
+            // Creamos una variable que nos indicara si se encontro o no el producto
+            let productoEncontrado = false
             // Buscamos en los pedidos del cliente el producto
             almacen[cliente].forEach(item => {
                 if(item['Producto'] === busProducto.nombre){
                     // Cuando lo encontremos actualizamos la cantidad
-                    item['Cantidad'] = cantidad
+                    item['Cantidad'] = cantidad;
+                    productoEncontrado = true
                 }
             });
-            actupedidoCliente = false
-            res.json({ message : 'Producto actualizado' })
+            // Si se encontro el producto enviamos un mensaje
+            if(productoEncontrado){
+                productoActualizado = {
+                    'Producto' : busProducto.nombre.charAt(0).toUpperCase() + busProducto.nombre.slice(1).toLowerCase(),
+                    'Precio' : busProducto.precio,
+                    'Cantidad' : cantidad
+                }
+                res.json({ message: 'Producto Actualizado', Producto : productoActualizado });
+            }else{
+                // En caso de que no se encuentre enviamos un mensaje
+                res.json({ message: 'Ese producto no está en el pedido' });
+            }
         }
         // En caso de que no se encuentre el cliente enviamos un mensaje
         else return res.json({ message : 'Ese cliente no se encuentra haciendo un pedido'})
@@ -164,19 +184,31 @@ const borrarProductoPedido = async (req, res) => {
         if(!almacen.hasOwnProperty(cliente)) return res.json({ message : 'No existe ningun producto en el pedido'})
         // Verificamos si el cliente tiene agregado a su pedido mas de un producto
         if(Object.keys(almacen[cliente]).length > 1) {
+            // Almacenamos la cantidad de elementos del pedido
+            const cantidaddeProductosPedido = almacen[cliente].length
             // Eliminamos un producto del pedido
             almacen[cliente] = almacen[cliente].filter(item => item['Producto'] !== busProducto.nombre)
-            // Enviamos un mensaje indicando que se borro el producto
-            res.json({ message : 'Producto borrado' })
+            // En caso de que se halla eliminado el producto
+            if(almacen[cliente].length != cantidaddeProductosPedido){
+                // Enviamos un mensaje indicando que se borro el producto
+                res.json({ message : 'Producto borrado' })
+            }else{
+                // En caso de que no enviamos un mensaje
+                res.json({ message : 'Ese producto no se encuentra en el pedido' })
+            }
         } 
         // Si solo tiene un producto en el pedido, eliminamos todo el pedido
         else {
-            // Verificamos si existe el cliente y eliminamos el pedido
-            if(almacen.hasOwnProperty(cliente)) {
+            // Verificamos que el producto este en el pedido para eliminarlo
+            if(almacen[cliente][0].Producto == busProducto.nombre) {
+                // Eliminamos toda la informacion del cliente
                 delete almacen[cliente]
+                // Enviamos un mensaje indicando que se borro el producto
+                res.json({ message : 'Producto borrado' })
+            }else{
+                // En caso de que no se encuentre el producto en el pedido enviamos un mensaje
+                res.json({ message : 'No existe ese producto en el pedido' })
             }
-            // Enviamos un mensaje indicando que se borro el producto
-            res.json({ message : 'Producto borrado' })
         }
     }catch(err){
         // Enviamos un mensaje en caso de que no se pudo borrar el producto al pedido
@@ -316,11 +348,11 @@ const buscarPedido = async (req, res) => {
         // Convertimos la primera letra en mayuscula y el resto en minuscula de los nombres de los productos
         const listarPedidos = Pedidos.map(pedido => {
             const productosFormateados = pedido.producto.map(producto => {
-              const nombreProducto = producto.charAt(0).toUpperCase() + producto.slice(1).toLowerCase();
-              return nombreProducto;
+                const nombreProducto = producto.charAt(0).toUpperCase() + producto.slice(1).toLowerCase();
+                return nombreProducto;
             });
             return { ...pedido.toObject(), producto: productosFormateados };
-          });
+        });
         // Mostramos todos los Pedidos del cliente
         res.status(200).json(listarPedidos);
     }catch(err){
