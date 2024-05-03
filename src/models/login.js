@@ -11,8 +11,11 @@ const RegistroSchema = new mongoose.Schema({
   username : { type : String, required : true },
   password : { type : String, required : true },
   email : { type : String, require  : true, unique  : true},
+  telefono : { type : Number, require : true, unique : true },
   token : { type : String, default : null },
-  confirmEmail : { type : Boolean, default : false }
+  confirmEmail : { type : Boolean, default : false },
+  admin : { type : Boolean, default : false },
+  inicioSesion : { type : Boolean, default : false }
 });
 
 

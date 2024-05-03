@@ -10,8 +10,12 @@ const Producto = require ('../models/productos.js')
 // Importamos el modelo Registro
 const Registro = require ('../models/login.js')
 
-// Creamos un json para almacenar la informacion de los pedidos de los clientes
-let almacen = {}
+// Importamos el modelo PedidoProductos
+const PedidoProductos = require ('../models/pedido_producto.js');
+
+// Importamos sendMailToConfirmBuyOfUser, sendMailToAdmin
+const { sendMailToConfirmBuyOfUser, sendMailToAdmin } = require('../config/nodemailer.js');
+
 
 const agregarProductoPedido = async (req, res) => {
     // Desestructuramos el objeto req.body
@@ -29,59 +33,27 @@ const agregarProductoPedido = async (req, res) => {
         const busProducto = await Producto.findById( producto )
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
+        // Almacenamos el nombre del producto
+        const veriProducto = busProducto.nombre
+        // Buscamos el producto del pedido en la base de datos
+        const busProductoPedido = await PedidoProductos.findOne({producto : veriProducto})
         // En caso de que no se encuentre ese producto enviamos un mensaje
         if(!busProducto || busProducto.length === 0) return res.json({ message : 'No existe ese producto' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
+        // En caso de que se encuentre ese producto en el pedido enviamos un mensaje
+        if(busProductoPedido) return res.json({ message : 'Ese producto ya esta en el pedido' })
         // En caso de que no se hallan realizado pedidos agregamos el primer producto a un cliente
-        if(Object.keys(almacen).length === 0){
-            // Creamos un arreglo con el id del cliente
-            almacen[cliente] = []
-            // Agregamos el producto al pedido del cliente
-            almacen[cliente].push({
-                'Producto' : busProducto.nombre,
-                'Precio' : busProducto.precio,
-                'Cantidad' : cantidad
-            })
-        }else{
-            // Creamos un boleano que nos indica si el cliente esta realizando un pedido
-            let pedidoCliente = false
-            // En caso de que ya existan pedidos, buscamos al cliente 
-            for (busc in almacen){
-                if(busc == cliente){
-                    // En caso de que se encuentre el cliente colocamos true
-                    pedidoCliente = true
-                    // Si se encontro el cliente detenemos el bucle
-                    break
-                }
-            }
-            // Si el cliente ya tiene agregado un producto y quiere agregar otro
-            if(pedidoCliente == true){
-                // Extraemos toda la informacion del pedido del cliente
-                const productosCliente = almacen[cliente]
-                // Buscamos el producto en el pedido del cliente
-                const productoExistente = productosCliente.find(productoPedido => productoPedido.Producto === busProducto.nombre)
-                // Enviamos un mensaje en caso de que ya exista el producto en el pedido
-                if (productoExistente) return res.json({ message: 'El producto ya fue agregado al pedido' })
-                // Agregamos otro producto al pedido
-                almacen[cliente].push({
-                    'Producto' : busProducto.nombre,
-                    'Precio' : busProducto.precio,
-                    'Cantidad' : cantidad
-                })
-            }else{
-                // En caso de que el cliente recien este agregando un producto
-                almacen[cliente] = []
-                // Agregamos un producto para el pedido del cliente
-                almacen[cliente].push({
-                    'Producto' : busProducto.nombre,
-                    'Precio' : busProducto.precio,
-                    'Cantidad' : cantidad
-                })
-            }
-            // Volvemos a colocar el booleano en false
-            pedidoCliente = false
-        }
+        const nuevoProductoPedido = new PedidoProductos({
+            _id : new mongoose.Types.ObjectId,
+            cliente : cliente,
+            producto : busProducto.nombre,
+            cantidad : cantidad,
+            precio : busProducto.precio
+        })
+        // Guardamos en la base de datos
+        await nuevoProductoPedido.save()
+        // Mostramos al cliente la informacion pero el nombre del producto la primera es mayuscula y el resto minuscula
         productoAgregado = {
             'Producto' : busProducto.nombre.charAt(0).toUpperCase() + busProducto.nombre.slice(1).toLowerCase(),
             'Precio' : busProducto.precio,
@@ -108,53 +80,36 @@ const actualizarProductoPedido = async (req, res) => {
     if(cantidad < 0) return res.json({ message : 'No se puede ingresar una cantidad negativa'})
     // Verificamos si se quiere ingresar una cantidad mayor a 20
     else if(cantidad > 20) return res.json({ message : 'La cantidad maxima es de 20'})
-    let productoActualizado = {}
     try{
         // Buscamos el producto en la base de datos
         const busProducto = await Producto.findById( producto )
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
+        // Almacenamos el nombre del producto
+        const veriProducto = busProducto.nombre
+        // Buscamos el producto del pedido en la base de datos
+        const busProductoPedido = await PedidoProductos.findOne({producto : veriProducto, cliente : cliente})
         // En caso de que no se encuentre ese producto enviamos un mensaje
         if(!busProducto || busProducto.length === 0) return res.json({ message : 'No existe ese producto' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
-        // Creamos un boleano que nos indica si el cliente esta realizando un pedido
-        let actupedidoCliente = false
-        for (busc in almacen){
-            if(busc == cliente){
-                // En caso de que se encuentre el cliente colocamos true
-                actupedidoCliente = true
-                // Si se encontro el cliente detenemos el bucle
-                break
-            }
+        // En caso de que no se encuentre ese producto en el pedido enviamos un mensaje
+        if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'No existe ese producto en el pedido' })
+        // Actualizamos el producto
+        const productoPedidoActualizado = await PedidoProductos.findByIdAndUpdate(
+            busProductoPedido._id,
+            {cantidad},
+            { new : true}
+        )
+        // Guardamos los cambios en la base de datos
+        await productoPedidoActualizado.save()
+        // Mostramos al cliente la informacion pero el nombre del producto la primera es mayuscula y el resto minuscula
+        productoActualizado = {
+            'Producto' : busProducto.nombre.charAt(0).toUpperCase() + busProducto.nombre.slice(1).toLowerCase(),
+            'Precio' : busProducto.precio,
+            'Cantidad' : cantidad
         }
-        // Verificamos si se encuentra el cliente
-        if(actupedidoCliente == true){
-            // Creamos una variable que nos indicara si se encontro o no el producto
-            let productoEncontrado = false
-            // Buscamos en los pedidos del cliente el producto
-            almacen[cliente].forEach(item => {
-                if(item['Producto'] === busProducto.nombre){
-                    // Cuando lo encontremos actualizamos la cantidad
-                    item['Cantidad'] = cantidad;
-                    productoEncontrado = true
-                }
-            });
-            // Si se encontro el producto enviamos un mensaje
-            if(productoEncontrado){
-                productoActualizado = {
-                    'Producto' : busProducto.nombre.charAt(0).toUpperCase() + busProducto.nombre.slice(1).toLowerCase(),
-                    'Precio' : busProducto.precio,
-                    'Cantidad' : cantidad
-                }
-                res.json({ message: 'Producto Actualizado', Producto : productoActualizado });
-            }else{
-                // En caso de que no se encuentre enviamos un mensaje
-                res.json({ message: 'Ese producto no está en el pedido' });
-            }
-        }
-        // En caso de que no se encuentre el cliente enviamos un mensaje
-        else return res.json({ message : 'Ese cliente no se encuentra haciendo un pedido'})
+        res.json({ message: 'Producto Actualizado', Producto : productoActualizado });
     }catch(err){
         // Enviamos un mensaje en caso de que no se pudo actualizar el producto al pedido
         res.status(500).json({ message : 'Error al actualizar la cantidad del producto en el pedido' })
@@ -176,40 +131,20 @@ const borrarProductoPedido = async (req, res) => {
         const busProducto = await Producto.findById( producto )
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
+        // Almacenamos el nombre del producto
+        const veriProducto = busProducto.nombre
+        // Buscamos el producto del pedido en la base de datos
+        const busProductoPedido = await PedidoProductos.findOne({producto : veriProducto, cliente : cliente})
         // En caso de que no se encuentre ese producto enviamos un mensaje
         if(!busProducto || busProducto.length === 0) return res.json({ message : 'No existe ese producto' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
-        // Verificamos si existe algun producto agregado al pedido
-        if(!almacen.hasOwnProperty(cliente)) return res.json({ message : 'No existe ningun producto en el pedido'})
-        // Verificamos si el cliente tiene agregado a su pedido mas de un producto
-        if(Object.keys(almacen[cliente]).length > 1) {
-            // Almacenamos la cantidad de elementos del pedido
-            const cantidaddeProductosPedido = almacen[cliente].length
-            // Eliminamos un producto del pedido
-            almacen[cliente] = almacen[cliente].filter(item => item['Producto'] !== busProducto.nombre)
-            // En caso de que se halla eliminado el producto
-            if(almacen[cliente].length != cantidaddeProductosPedido){
-                // Enviamos un mensaje indicando que se borro el producto
-                res.json({ message : 'Producto borrado' })
-            }else{
-                // En caso de que no enviamos un mensaje
-                res.json({ message : 'Ese producto no se encuentra en el pedido' })
-            }
-        } 
-        // Si solo tiene un producto en el pedido, eliminamos todo el pedido
-        else {
-            // Verificamos que el producto este en el pedido para eliminarlo
-            if(almacen[cliente][0].Producto == busProducto.nombre) {
-                // Eliminamos toda la informacion del cliente
-                delete almacen[cliente]
-                // Enviamos un mensaje indicando que se borro el producto
-                res.json({ message : 'Producto borrado' })
-            }else{
-                // En caso de que no se encuentre el producto en el pedido enviamos un mensaje
-                res.json({ message : 'No existe ese producto en el pedido' })
-            }
-        }
+        // En caso de que no se encuentre ese producto en el pedido enviamos un mensaje
+        if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'No existe ese producto en el pedido' })
+        // Buscamos el producto y lo eliminamos
+        await PedidoProductos.findByIdAndDelete(busProductoPedido._id)
+        // Enviamos un mensaje indicando que se borro el producto
+        res.json({ message : 'Producto borrado del pedido' })
     }catch(err){
         // Enviamos un mensaje en caso de que no se pudo borrar el producto al pedido
         res.status(500).json({ message : 'Error al borrar el producto del pedido del cliente' })
@@ -227,16 +162,16 @@ const eliminarPedido = async (req, res) => {
     try{
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
+        // Buscamos los producto del pedido en la base de datos
+        const busProductoPedido = await PedidoProductos.find({ cliente : cliente})
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
-        // Buscamos al cliente y borramos todo el pedido
-        if(almacen.hasOwnProperty(cliente)) {
-            delete almacen[cliente]
-            res.json({ message : 'Pedido borrado' })
-        }else{
-            // En caso de que no se encuentre el cliente enviamos un mensaje
-            res.json({ message : 'El cliente no ha realizado un pedido'})
+        // En caso de que no se encuentre ese cliente enviamos un mensaje
+        if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'Ese cliente no se encuentra haciendo un pedido' })
+        for(i = 0 ; i < busProductoPedido.length ; i++){
+            const eliminarPedido = await PedidoProductos.findByIdAndDelete(busProductoPedido[i]._id)
         }
+        res.json({ message : 'Pedido eliminado' })
     }catch(err){
         // Enviamos un mensaje en caso de que no se pudo borrar el pedido
         res.status(500).json({ message : 'Error al borrar todo el pedido del cliente' })
@@ -251,42 +186,27 @@ const listarProductosPedido = async (req, res) => {
     const cliente = req.body.cliente
     // Validar todos los campos llenos
     if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
-    // Revisamos si el cliente ha agregado algun producto al pedido
-    if(!almacen.hasOwnProperty(cliente)) return res.json({ message : 'No has agregado ningun producto al pedido'})
     try{
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
+        // Buscamos los producto del pedido en la base de datos
+        const busProductoPedido = await PedidoProductos.find({ cliente : cliente})
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
-        // Buscamos el cliente por medio de un bucle
-        for (busc in almacen){
-            // En caso de que lo encontremos
-            if(busc == cliente){
-                // Creamos un nuevo json
-                products = {}
-                // Un nuevo arreglo
-                products[busc] = []
-                for(i = 0 ; i < almacen[busc].length ; i++){
-                    // Extraemos la informacion del pedido
-                    const product = Object(almacen[busc][i])
-                    // Extraemos de manera indivual la cantidad producto y precio
-                    const cantidad = product.Cantidad
-                    const precio = product.Precio
-                    // Convertimos la primera letra del producto en mayuscula y el resto en minuscula
-                    const producto = product.Producto.charAt(0).toUpperCase() + product.Producto.slice(1).toLowerCase()
-                    // Subimos la nueva informacion al nuevo arreglo
-                    products[busc].push({
-                        "Producto" : producto,
-                        "Cantidad" : cantidad,
-                        "Precio" : precio
-                    })
-                }
-                // Mostramos todos los productos del pedido
-                res.json(products[busc])
-                // Si se encontro el cliente detenemos el bucle
-                break
-            }
+        // En caso de que no se encuentre ese cliente enviamos un mensaje
+        if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'Ese cliente no se encuentra haciendo un pedido' })
+        let mostrar = {}
+        mostrar[busCliente._id] = []
+        for (i = 0 ; i < busProductoPedido.length ; i++){
+            const nombreProducto = busProductoPedido[i].producto.charAt(0).toUpperCase() + busProductoPedido[i].producto.slice(1).toLowerCase();
+            mostrar[busCliente._id].push({
+                'Producto' : nombreProducto,
+                'Cantidad' : busProductoPedido[i].cantidad,
+                'Precio' : busProductoPedido[i].precio
+            })
         }
+        // Mostramos todo el pedido
+        res.json({ Pedido : mostrar})
     }catch(err){
         // Enviamos un mensaje en caso de que no se pudo mostrar el pedido
         res.status(500).json({ message : 'Error al mostrar todo el pedido del cliente' })
@@ -370,12 +290,8 @@ const registroPedido = async (req, res) => {
     let comision = req.body.comision
     // Validar todos los campos llenos
     if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
-    // Revisamos si el cliente ha agregado algun producto al pedido
-    if(!almacen.hasOwnProperty(cliente)) return res.json({ message : 'No has agregado ningun producto al pedido'})
     // Creamos variables temporales que nos serviran para poder hacer calculos
     let total = 0
-    let cantidad = 0
-    let precio = 0
     // En caso de que el cliente quiera que el pedido sea a domicilio tendra un costo de 50 ctvs adicional
     if(comision == true) {
         total = 0.5
@@ -388,26 +304,12 @@ const registroPedido = async (req, res) => {
     try{
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
-        console.log(busCliente)
+        // Buscamos los productos del pedido en la base de datos
+        const busProductoPedido = await PedidoProductos.find({ cliente : cliente})
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
-        // Creamos un boleano que nos indica si el cliente esta realizando un pedido
-        let guardarPedidoCliente = false
-        for (busc in almacen){
-            if(busc == cliente){
-                // En caso de que se encuentre el cliente colocamos true
-                guardarPedidoCliente = true
-                // Sacamos el precio total del pedido
-                for(i in almacen[busc]){
-                    cantidad = almacen[busc][i].Cantidad
-                    precio = almacen[busc][i].Precio
-                    subtotal = cantidad * precio
-                    total += subtotal
-                }
-                // Si se encontro el cliente detenemos el bucle
-                break
-            }
-        }
+        // En caso de que no se encuentre ese producto en el pedido enviamos un mensaje
+        if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'Ese cliente no se encuentra haciendo un pedido' })
         // Creamos una nueva instancia 
         const nuevoPedido = new Pedido({
             _id : new mongoose.Types.ObjectId,
@@ -418,33 +320,81 @@ const registroPedido = async (req, res) => {
             comision : comision,
             total : total
         })
-        // Buscamos el pedido del cliente
-        for (busc in almacen){
-            if(busc == cliente){
-                // Recorremos los datos del archivo JSON y agregas los valores a los campos de tipo array
-                for (i = 0 ; i < almacen[busc].length ; i++){
-                    // Almacenamos la informacion de producto cantidad precio
-                    const producto = almacen[busc][i].Producto;
-                    const cantidad = almacen[busc][i].Cantidad;
-                    const precio = almacen[busc][i].Precio;
-                    // Subimos la informacion de producto cantidad precio al array
-                    nuevoPedido.producto.push(producto)
-                    nuevoPedido.cantidad.push(cantidad)
-                    nuevoPedido.precio.push(precio)
-                }
-            }
+        let mostrar = {}
+        mostrar[busCliente._id] = []
+        mostrar[busCliente._id].push({
+            'Producto' : [],
+            'Cantidad' : [],
+            'Precio' : []
+        })
+        // Recorremos los datos de la coleccion y agregas los valores a los campos de tipo array
+        for (i = 0 ; i < busProductoPedido.length ; i++){
+            // Almacenamos la informacion de producto cantidad precio
+            const producto = busProductoPedido[i].producto;
+            const cantidad = busProductoPedido[i].cantidad;
+            const precio = busProductoPedido[i].precio;
+            // Calculamos el precio del total del pedido
+            const subtotal = precio*cantidad
+            // Lo vamos almacenando
+            total += subtotal
+            // Subimos la informacion de producto cantidad precio al array
+            nuevoPedido.producto.push(producto);
+            nuevoPedido.cantidad.push(cantidad);
+            nuevoPedido.precio.push(precio);
+            const nombreProducto = busProductoPedido[i].producto.charAt(0).toUpperCase() + busProductoPedido[i].producto.slice(1).toLowerCase();
+            mostrar[busCliente._id][0].Producto.push(nombreProducto)
+            mostrar[busCliente._id][0].Cantidad.push(cantidad)
+            mostrar[busCliente._id][0].Precio.push(precio)
+            // Vamos eliminando cada producto de la coleccion PedidoProductos
+            await PedidoProductos.findByIdAndDelete(busProductoPedido[i]._id)
         }
+        mostrar[busCliente._id].push({
+            'Total' : total,
+            'Fecha' : nuevoPedido.fecha
+        })
+        // Guardamos el total del pedido
+        nuevoPedido.total = total;
         // Guardamos en la base de datos
         await nuevoPedido.save()
-        // Eliminamos el pedido del json una vez se haya almacenado en la bdd
-        if(almacen.hasOwnProperty(cliente)) {
-            delete almacen[cliente]
-        }
+        const email = busCliente.email
+        const pedido = String(nuevoPedido._id)
+        const telefono = busCliente.telefono
+        // Enviamos un correo al cliente respecto a su pedido
+        await sendMailToConfirmBuyOfUser(email, pedido)
+        // Enviamos un correo al administrador con el pedido del cliente luego de 5 segundos de haber enviado el correo al cliente
+        setTimeout(async () => {
+            await sendMailToAdmin(pedido, telefono);
+          }, 5000);
         // Enviamos un mensaje
-        res.json({ message : 'Pedido realizado con exito', Pedido : nuevoPedido })
+        res.json({ message : 'Pedido realizado con exito', Pedido : mostrar })
     }catch(err){
         // Enviamos un mensaje en caso de que no se pudo guardar el pedido
         res.status(500).json({ message : 'Error al guardar el pedido del cliente' })
+        // Mostramos el mensaje en consola
+        console.log(err)
+    }
+}
+
+const verPedido = async(req, res) => {
+    // Extraemos el id de la url
+    const PedidoId = req.params.id
+    try{
+        const Pedidos = await Pedido.find({ _id : PedidoId})
+        // En caso de que no exista ese Favorito enviamos un mensaje
+        if (!Pedidos || Pedidos.length === 0) return res.json({ message: 'No existe ese Pedido del Cliente' });
+        // Convertimos la primera letra en mayuscula y el resto en minuscula de los nombres de los productos
+        const listarPedidos = Pedidos.map(pedido => {
+            const productosFormateados = pedido.producto.map(producto => {
+                const nombreProducto = producto.charAt(0).toUpperCase() + producto.slice(1).toLowerCase();
+                return nombreProducto;
+            });
+            return { ...pedido.toObject(), producto: productosFormateados };
+        });
+        // Mostramos todos los Pedidos del cliente
+        res.status(200).json(listarPedidos);
+    }catch(err){
+        // Enviamos un mensaje en caso de que no se pudo buscar el pedido
+        res.status(500).json({ message : 'Error mostrar el pedido del cliente' })
         // Mostramos el mensaje en consola
         console.log(err)
     }
@@ -458,5 +408,6 @@ module.exports = {
     listarProductosPedido,
     mostrarPedidos,
     buscarPedido,
-    registroPedido
+    registroPedido,
+    verPedido
 }

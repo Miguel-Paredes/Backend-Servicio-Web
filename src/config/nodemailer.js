@@ -2,16 +2,14 @@
 const nodemailer = require("nodemailer");
 
 let transporter = nodemailer.createTransport({
-    // Servicio de correo utilizado (en este caso, Gmail)
-    service: 'gmail',
-     // Host del servidor de correo (obtenido de variables de entorno)
+    // Host del servidor de correo (obtenido de variables de entorno)
     host: process.env.HOST_MAILTRAP,
-     // Puerto del servidor de correo (obtenido de variables de entorno)
+    // Puerto del servidor de correo (obtenido de variables de entorno)
     port: process.env.PORT_MAILTRAP,
     auth: {
         // Usuario de correo (obtenido de variables de entorno)
         user: process.env.USER_MAILTRAP,
-         // Contraseña de correo (obtenida de variables de entorno)
+        // Contraseña de correo (obtenida de variables de entorno)
         pass: process.env.PASS_MAILTRAP,
     }
 });
@@ -40,7 +38,7 @@ const sendMailToUser = (userMail, token) => {
                 </div>
                 <a href=${process.env.URL}/login/confirmar/${token} style="background-color: #006256; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Confirmar cuenta</a>
                 <footer style="background-color: #ffffff; padding: 1rem; text-align: center;">
-                    <p style="color: #666666; margin: 0;">© 2024 Poner nombre Micromercado. Todos los derechos reservados.</p>
+                    <p style="color: #666666; margin: 0;">Mika y Vale © 2024. Todos los derechos reservados.</p>
                 </footer>
             </div>
         </body> 
@@ -61,7 +59,7 @@ const sendMailToUser = (userMail, token) => {
 const sendMailToRecoveryPassword = async(userMail,token)=>{
     let info = await transporter.sendMail({
         // Remitente del correo
-    from: 'nombredelamicroempresa@vet.com',
+    from: process.env.USER_MAILTRAP,
      // Destinatario del correo
     to: userMail,
      // Asunto del correo
@@ -77,7 +75,7 @@ const sendMailToRecoveryPassword = async(userMail,token)=>{
             </div>
             <a href=${process.env.URL}/login/recuperar-password/${token} style="background-color: #006256; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Restablecer Contraseña</a>
             <footer style="background-color: #ffffff; padding: 1rem; text-align: center;">
-                <p style="color: #666666; margin: 0;">© 2024 Poner nombre Micromercado. Todos los derechos reservados.</p>
+                <p style="color: #666666; margin: 0;">Mika y Vale © 2024. Todos los derechos reservados.</p>
             </footer>
         </div>
     </body>
@@ -87,24 +85,86 @@ const sendMailToRecoveryPassword = async(userMail,token)=>{
     console.log("Mensaje enviado satisfactoriamente: ", info.messageId);
 }
 
-const sendMailToEmpresa = async(userMail,password)=>{
-    let info = await transporter.sendMail({
+const sendMailToConfirmBuyOfUser = async(userMail,id)=>{
+    let compra = await transporter.sendMail({
         // Remitente del correo
-    from: 'admin@vet.com',
+    from: process.env.USER_MAILTRAP,
      // Destinatario del correo
     to: userMail,
      // Asunto del correo
-    subject: "Correo de bienvenida",
+    subject: "Confirmación Compra",
     html: `
-    <h1>message</h1>
+    <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; display: flex; justify-content: center; align-items: center; margin-top: 20px; width: 100%;">
+
+        <div style="max-width: 90%; padding: 2rem; text-align: center; border: 1px solid #dddddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+
+            <div style="background-color: #00e8bc; /* Fondo verde */ padding: 1rem; border-radius: 10px; /* Bordes redondeados */">
+                <h1 style="color: #ffffff; margin-bottom: 2rem;">!Muchas gracias. Por su compra!</h1>
+            </div>
+            
+            <div style="text-align: left; margin-bottom: 1rem;">
+                <p style="color: #333333; margin-bottom: 2rem; text-align: justify;">
+                    Estimado cliente,<br>
+                    Agradecemos tu confianza al momento de realizar tu pedido con nosotros. Esperamos que hayas encontrado todos los productos que buscas y que tu experiencia de compra fuese satisfactoria. 
+                    <br>Nuestro compromiso es brindarte el mejor servicio posible, por lo que si tienes alguna pregunta adicional, no dudes en comunicarte con nuestro equipo de soporte. Estamos aquí para ayudarte en todo momento y resolver cualquier consulta que puedas tener.
+                    ¡Gracias por elegirnos y esperamos verte nuevamente pronto!
+                    </p>
+            </div>
+
+            <a href=${process.env.URL}/pedidos/${id} style="background-color: #006256; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Ver pedido</a>
+            <a href=https://wa.me/+593${process.env.CELULAR_ADMINISTRADOR} style="background-color: #006256; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Hablar con el administrador</a>
+
+            <footer style="background-color: #ffffff; padding: 1rem; text-align: center;">
+                <p style="color: #666666; margin: 0;">Mika y Vale © 2024. Todos los derechos reservados.</p>
+            </footer>
+        </div>
+    </body>
     `
     });
     // Muestra un mensaje de confirmación si el correo se envió correctamente
-    console.log("Mensaje enviado satisfactoriamente: ", info.messageId);
+    console.log('Correo enviado al cliente: ' + compra.response);
+}
+
+const sendMailToAdmin = async(id, telefono)=>{
+    let compra = await transporter.sendMail({
+        // Remitente del correo
+    from: process.env.USER_MAILTRAP,
+     // Destinatario del correo
+    to: process.env.EMAIL_ADMINISTRADOR,
+     // Asunto del correo
+    subject: "Confirmación Compra",
+    html: `
+    <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; display: flex; justify-content: center; align-items: center; margin-top: 20px; width: 100%;">
+
+        <div style="max-width: 90%; padding: 2rem; text-align: center; border: 1px solid #dddddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+
+            <div style="background-color: #00e8bc; /* Fondo verde */ padding: 1rem; border-radius: 10px; /* Bordes redondeados */">
+                <h1 style="color: #ffffff; margin-bottom: 2rem;">!Nuevo Pedido!</h1>
+            </div>
+            
+            <div style="text-align: left; margin-bottom: 1rem;">
+                <p style="color: #333333; margin-bottom: 2rem; text-align: justify;">
+                    Se ha realizado un nuevo pedido,<br>
+                    Por favor revisar que productos han sido solicitados por el cliente
+                    </p>
+            </div>
+            
+            <a href=${process.env.URL}/pedidos/${id} style="background-color: #006256; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Ver pedido</a>
+            <a href=https://wa.me/+593${telefono} style="background-color: #006256; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Hablar con el cliente</a>
+
+            <footer style="background-color: #ffffff; padding: 1rem; text-align: center;">
+                <p style="color: #666666; margin: 0;">Mika y Vale © 2024. Todos los derechos reservados.</p>
+            </footer>
+        </div>
+    </body>`
+    });
+    // Muestra un mensaje de confirmación si el correo se envió correctamente
+    console.log('Correo enviado al administrador: ' + compra.response);
 }
 
 module.exports = {
     sendMailToUser,
     sendMailToRecoveryPassword,
-    sendMailToEmpresa
+    sendMailToConfirmBuyOfUser,
+    sendMailToAdmin
 }

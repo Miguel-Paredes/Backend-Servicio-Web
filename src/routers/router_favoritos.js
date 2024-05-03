@@ -8,7 +8,7 @@ const {
     borrarFavorito
 } = require('../controllers/favoritos_controllers');
 // Importamos la autentificacion
-const { verificadoAutentication } = require('../helpers/autenticacion');
+const verificadoAutentication = require('../helpers/autenticacion');
 
 // Importamos Router para crear el router de favoritos
 const routerFavoritos = express.Router();

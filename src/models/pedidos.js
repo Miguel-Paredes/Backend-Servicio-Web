@@ -18,7 +18,8 @@ const pedidoSchema = mongoose.Schema({
     cantidad : [{ type : Number, require : true, trim : true }],
     precio : [{ type : Number, require : true, trim : true }],
     comision : { type : Boolean, require : true, default : false },
-    total : { type : Number, require : true, trim : true }
+    total : { type : Number, require : true, trim : true },
+    fecha: { type: Date, default: () => Date.now() - 5 * 60 * 60 * 1000, required: true }
 }); 
 
 // Exportamos el modelo

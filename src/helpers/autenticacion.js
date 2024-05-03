@@ -1,12 +1,13 @@
-// Creamos un arreglo
-const verificado = []
+// Importamos el modelo Registro
+const Registro = require('../models/login.js');
 
 // Metodo para proteger las rutas
-const verificadoAutentication = (req, res, next) => {
+const verificadoAutentication = async (req, res, next) => {
+  const cliente = req.body.cliente
   // Buscamos en el arreglo si inicio sesion o no
-  const sesion = verificado.find( cliente => cliente === req.body.cliente)
+  const sesion = await Registro.findOne({cliente})
   // Si existe un inicio de sesion
-  if(sesion){
+  if(sesion.inicioSesion == true && sesion.admin == false){
     // Continuar
     return next();
   }else{
@@ -16,7 +17,4 @@ const verificadoAutentication = (req, res, next) => {
 }
 
 // Importamos la proteccion de las rutas y el arreglo
-module.exports = {
-  verificadoAutentication,
-  verificado
-}
+module.exports = verificadoAutentication

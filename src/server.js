@@ -27,7 +27,7 @@
 // Configuraciones
     // Configuramos una variable dentro de app que almacena
     // el puerto en el cual se va a alzar el servidor
-    app.set('port', process.env.port || 3000)
+    app.set('port', process.env.port || 30000)
     // Habilitamos el middleware de CORS para permitir solicitudes de diferentes orígenes
     app.use(cors())
     // Establecer la carpeta temporal y el directorio

@@ -2,11 +2,6 @@
 const Registro = require('../models/login.js');
 // Importamos sendMailToUser-sendMailToRecoveryPassword para poder enviar los respectivos correos
 const { sendMailToUser, sendMailToRecoveryPassword } = require('../config/nodemailer.js');
-// Importamos el arreglo
-const { verificado } = require('../helpers/autenticacion.js');
-// Creamos una variable global
-let inicioAdministrador = false;
-const { verifAdministrador } = require('../helpers/permiso_admin.js')
 
 const inicioLogin = async (req, res) => {
   // Desestructuramos el objeto req.body
@@ -17,17 +12,15 @@ const inicioLogin = async (req, res) => {
   try {
     // Buscamos el correo en la base de datos
     const user = await Registro.findOne({ email });
-    // Buscamos en el arreglo si el usuario ya inicio sesion
-    const sesion = verificado.find( cliente => cliente === user.id)
-    // En caso de que haya iniciado sesion enviamos un mensaje
-    if(sesion == user.id) return res.json({ message : 'El usuario ya inicio sesión'})
+    // Verificamos si existe el usuario
+    if(!user) return res.status(404).json({msg:'Lo sentimos, el usuario no se encuentra registrado'})
+    // Verificamos si ya confirmo la cuenta
+    if(user?.confirmEmail===false) return res.status(403).json({msg:'Lo sentimos, debe verificar su cuenta'})
     // En caso de que el administrador ya haya iniciado sesion
-    else if(user.email == 'admin' && inicioAdministrador == true) return res.json({ message : 'El administrador ya inicio sesion'})
+    if(user.inicioSesion == true && user.admin == true) return res.json({ message : 'El administrador ya inicio sesion'})
+    // En caso de que haya iniciado sesion enviamos un mensaje
+    else if(user.inicioSesion == true) return res.json({ message : 'El usuario ya inicio sesión'})
     else{
-      // Verificamos si existe el usuario
-      if(!user) return res.status(404).json({msg:'Lo sentimos, el usuario no se encuentra registrado'})
-      // Verificamos si ya confirmo la cuenta
-      if(user?.confirmEmail===false) return res.status(403).json({msg:'Lo sentimos, debe verificar su cuenta'})
       // Desincriptamos la contraseña
       const contra = await user.isCorrectPassword(password)
       // Creamos condicionales para verificar el el correo y la contraseña
@@ -39,15 +32,8 @@ const inicioLogin = async (req, res) => {
       else if (!contra) return res.status(500).json({ message : 'Contraseña incorrecto'})
       // En caso de que todo este en orden enviamos un mensaje
       else {
-        // Verificamos que si el administrador quiere iniciar sesion
-        if(user.email == 'admin') { 
-          // Cambiamos el valor de la variable a true
-          inicioAdministrador = true
-          // Enviamos a la funcion indicando que el administrador inicio sesion
-          verifAdministrador(inicioAdministrador);
-        }
-        // En caso de que sea otro usuario enviamos el id al arreglo
-        else { verificado.push(user.id) }
+        // Actualizamos el campo de inicio de sesion en true
+        await Registro.findByIdAndUpdate(user._id, {inicioSesion : true}, { new : true})
         // Enviamos un mensaje de que se autentico el usuario
         res.status(200).send('Usuario Autenticado Correctamente');
       }
@@ -62,15 +48,19 @@ const inicioLogin = async (req, res) => {
 
 const registroLogin = async (req, res) => {
   // Desestructuramos el objeto req.body
-  // Extraemos la propiedad email en una variable 
-  const { email } = req.body;
+  // Extraemos la propiedad email y telefono variables separadas
+  const { email, telefono } = req.body;
   try {
     // Validar todos los campos llenos
     if (Object.values(req.body).includes('')) return res.status(400).json({msg:'Lo sentimos, debes llenar todos los campos'})
     // Buscamos el correo en la base de datos
-    const exisUsu = await Registro.findOne({ email })
+    const exisCorreo = await Registro.findOne({ email })
+    // Buscamos el correo en la base de datos
+    const exisTelefono = await Registro.findOne({ telefono })
     // En caso de que exista el correo enviamos un mensaje
-    if(exisUsu) return res.status(400).json({ msg:'Lo sentimos, el email ya se encuentra registrado' })
+    if(exisCorreo) return res.status(400).json({ msg:'Lo sentimos, el email ya se encuentra registrado' })
+    // En caso de que exista el telefono enviamos un mensaje
+    if(exisTelefono) return res.status(400).json({ msg:'Lo sentimos, el telefono celular ya se encuentra registrado' })
     // Creamos una nueva instancia
     const user = new Registro(req.body);
     // Creamos un token
@@ -165,15 +155,17 @@ const nuevoPassword = async (req, res) => {
 const administrador = async (req, res) => {
   // Creamos las credenciales para el administrador
   const username = 'admin';
-  const password = 'admin';
-  const email = 'admin';
+  const password = 'Minimarket2024';
+  const email = process.env.EMAIL_ADMINISTRADOR;
+  const telefono = process.env.CELULAR_ADMINISTRADOR;
   const confirmEmail = true;
+  const admin = true;
   try {
     // Buscamos si ya hay el usuario del administrador
     const buscarUsername = await Registro.find({ username });
     // En caso de que no este creada le creamos
     if (buscarUsername.length === 0) {
-      const user = new Registro({ username, password, email, confirmEmail });
+      const user = new Registro({ username, password, email, confirmEmail, admin, telefono });
       await user.save();
     }
   } catch (error) {
@@ -186,23 +178,12 @@ const cierreSesionLogin = async (req, res) => {
   // Almacenamos el email del usuario para poder cerrar sesión
   const email = req.body.email;
   try {
-    // Verificamos si el administrador quiere cerrar sesión
-    if (email === 'admin') {
-      // Cambiamos el valor de la variable a false
-      inicioAdministrador = false;
-      // Enviamos a la funcion el cierre de sesion del administrador
-      verifAdministrador(inicioAdministrador);
-      console.log('Se cerro la sesion del administrador')
-    } else {
-      // En caso de que sea un usuario
-      // Buscamos el usuario en la base de datos
-      const cierreUsuario = await Registro.findOne({ email: email });
-      // Almacenamos la posición del id del usuario en el arreglo
-      const index = verificado.findIndex(cliente => cliente === String(cierreUsuario._id));
-      // Eliminamos el inicio de sesión del usuario
-      if (index !== -1) { verificado.splice(index, 1); }
-      console.log('Se cerro la sesion del usuario')
-    }
+    // Buscamos el correo en la base de datos
+    const user = await Registro.findOne({ email });
+    // Verificamos si iniciaron sesion
+    if(user.inicioSesion == false) return res.json({ message : 'Ese usuario no inicio sesion'})
+    // Cerramos la sesion
+    await Registro.findByIdAndUpdate(user._id, {inicioSesion : false}, { new : true})
     // Redireccionamos al login
     res.redirect(`${process.env.URL}/login`);
   } catch (err) {
@@ -212,6 +193,41 @@ const cierreSesionLogin = async (req, res) => {
     console.log(err);
   }
 };
+
+function cierreSesionGlobal(hora, minuto, segundo, callback) {
+  setInterval(function() {
+    const now = new Date();
+    const currentHour = now.getHours();
+    const currentMinute = now.getMinutes();
+    const currentSecond = now.getSeconds();
+    if (currentHour === hora && currentMinute === minuto && currentSecond === segundo) {
+      callback();
+    }
+  }, 1000); // Comprueba cada segundo
+}
+
+// El codigo se ejecutara a las 5:00 am hora Ecuador
+cierreSesionGlobal(5, 0,0, function() {
+  cierreSesion()
+  console.log('Cerradas todas las sesiones de usuario');
+  // Aquí puedes colocar el código que deseas ejecutar
+});
+
+const cierreSesion = async() =>{
+  try {
+    // Buscamos el correo en la base de datos
+    const user = await Registro.find();
+    for (i = 0 ; i < user.length ; i++){
+      // Cerramos la sesion
+      await Registro.findByIdAndUpdate(user[i]._id, {inicioSesion : false}, { new : true})
+    }
+  } catch (err) {
+    // En caso de haber un error, indicamos que no se pudo cerrar la sesión del usuario
+    console.log({ message: 'Error al cerrar las sesiónes del usuario' });
+    // Mostramos el error
+    console.log(err);
+  }
+}
 
 // Exportamos los controladores
 module.exports = {
