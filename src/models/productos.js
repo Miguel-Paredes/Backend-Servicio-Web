@@ -6,6 +6,7 @@ const productoSchema = new mongoose.Schema({
     _id : mongoose.Schema.Types.ObjectId,
     nombre : { type : String, required : true, unique : true, trim : true },
     precio : { type : Number, required : true, trim : true },
+    cantidad : { type : Number, required : true},
     descripcion : { type : String, trim : true },
     categoria : { 
       type : mongoose.Schema.Types.String,

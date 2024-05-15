@@ -400,6 +400,51 @@ const verPedido = async(req, res) => {
     }
 }
 
+const mostrarPedidosAdministrador = async (req, res) => {
+    try {
+        // Buscamos los pedidos en la bdd
+        const Pedidos = await Pedido.find()
+        // En caso de que no existan pedidos enviamos un mensaje
+        if(!Pedidos || Pedidos.length === 0) return res.json({ message : 'No existen pedidos'})
+        // Mostramos los pedidos
+        res.json(Pedidos)
+    } catch(err){
+        // Enviamos un mensaje en caso de que no se pudo mostrar todos los pedidos
+        res.json({ message : 'Error al mostrar todos los pedidos'})
+        // Mostramos los errores
+        console.log(err)
+    }
+}
+
+const buscarPedidoAdministrador = async (req, res) => {
+    // Desestructuramos el objeto req.body
+    // Extraemos las propiedades telefono y fecha en variables separadas
+    const { telefono, fecha } = req.body
+    // Declaramos el inicio y el fin de las fechas
+    const inicio = new Date(fecha)
+    const fin = new Date(fecha)
+    try {
+        // Buscamos los pedidos en la bdd
+        const cliente = await Registro.findOne({ telefono })
+        // En caso de que no existan pedidos enviamos un mensaje
+        if(!cliente || cliente.length === 0) return res.json({ message : 'No ese cliente'})
+        const Pedidos = await Pedido.find({
+            cliente : cliente.id,
+            fecha : {
+                $gte : new Date(inicio.setHours(0,0,0,0)),
+                $lt : new Date(fin.setHours(23,59,59,999))
+            }
+        })
+        // Mostramos los pedidos
+        res.json(Pedidos)
+    } catch(err){
+        // Enviamos un mensaje en caso de que no se pudo mostrar todos los pedidos
+        res.json({ message : 'Error al mostrar todos los pedidos'})
+        // Mostramos los errores
+        console.log(err)
+    }
+}
+
 module.exports = {
     agregarProductoPedido,
     actualizarProductoPedido,
@@ -409,5 +454,7 @@ module.exports = {
     mostrarPedidos,
     buscarPedido,
     registroPedido,
-    verPedido
+    verPedido,
+    mostrarPedidosAdministrador,
+    buscarPedidoAdministrador
 }

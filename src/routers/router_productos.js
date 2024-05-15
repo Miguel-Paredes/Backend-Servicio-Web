@@ -10,7 +10,7 @@ const {
     registrarProducto
 } = require('../controllers/productos_controllers.js');
 // Importamos la proteccion de rutas del administrador
-const { verificadoAdministrador } = require('../helpers/permiso_admin.js');
+const verificadoAdministrador = require('../helpers/permiso_admin.js');
 
 // Importamos Router para crear el router de productos
 const routerProductos = express.Router();

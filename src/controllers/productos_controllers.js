@@ -63,7 +63,7 @@ const buscarProducto = async (req, res) => {
 const registrarProducto = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades nombre, precio, descripcion y categoria en variables separadas 
-    const { nombre, precio, descripcion } = req.body
+    const { nombre, precio, descripcion, cantidad } = req.body
     let { categoria } = req.body
     categoria = categoria.toUpperCase()
     // Validar todos los campos llenos
@@ -78,6 +78,9 @@ const registrarProducto = async (req, res) => {
         // Colocamos condicionales para evitar que se ingresen numeros negativos
         // En caso de que el precio menor a 0 enviamos un mensaje
         if(precio <= 0) return res.json ({ message : 'El precio debe de ser mayor a 0'})
+        // En caso de que el precio menor a 0 enviamos un mensaje
+        if(cantidad <= 0) return res.json({ message : 'La cantidad debe de ser mayor a 0'})
+        // Verificamos si existe la categoria
         if(!exisCategoria) return res.json({ message : 'No existe esa categoria' })
         // Creamos una nueva instancia 
         const nuevoProducto = new Producto({
@@ -90,7 +93,9 @@ const registrarProducto = async (req, res) => {
             // Asignamos el valor de la variable descripcion a la propiedad descripcion
             descripcion,
             // Asignamos el valor de la variable categoria a la propiedad categoria
-            categoria
+            categoria,
+            // Asignamos el valor de la variable cantidad a la propiedad cantidad
+            cantidad
         });
         if(!(req.files?.imagen)) return res.json({ message : "Se requiere una imagen" })
         // Carga la imagen utilizando una función 'uploadImage' y espera a que se complete
@@ -120,7 +125,7 @@ const actualizarProducto = async (req, res) => {
     const ProductoId = req.params.id
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades nombre, precio, descripcion y categoria en variables separadas 
-    const { nombre, precio, descripcion, categoria, imagen } = req.body
+    const { nombre, precio, descripcion, categoria, imagen, cantidad } = req.body
     // Validar todos los campos llenos
     if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
     try{
@@ -132,6 +137,9 @@ const actualizarProducto = async (req, res) => {
         // Colocamos condicionales para evitar que se ingresen numeros negativos
         // En caso de que el precio menor a 0 enviamos un mensaje
         else if (precio <= 0) return res.json ({ message : 'El precio debe de ser mayor a 0'})
+        // En caso de que el precio menor a 0 enviamos un mensaje
+        if(cantidad <= 0) return res.json({ message : 'La cantidad debe de ser mayor a 0'})
+        // Verificamos si existe la categoria
         else if (!exisCategoria) return res.json({ message : 'No existe esa categoria' })
         ProductoActualizado = await Producto.findByIdAndUpdate(
             ProductoId,
@@ -139,6 +147,7 @@ const actualizarProducto = async (req, res) => {
                 nombre,
                 precio,
                 descripcion,
+                categoria,
                 categoria
             },
             { new : true}

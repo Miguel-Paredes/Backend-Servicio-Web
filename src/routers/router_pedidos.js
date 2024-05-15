@@ -9,10 +9,14 @@ const {
     borrarProductoPedido,
     actualizarProductoPedido,
     eliminarPedido,
-    verPedido
+    verPedido,
+    buscarPedidoAdministrador,
+    mostrarPedidosAdministrador
 } = require('../controllers/pedidos_controllers');
 // Importamos la autentificacion
 const verificadoAutentication = require('../helpers/autenticacion');
+// Importamos la autentificacion del administrador
+const verificadoAdministrador = require('../helpers/permiso_admin');
 
 // Importamos Router para crear el router de pedidos
 const routerPedidos = express.Router();
@@ -23,6 +27,12 @@ routerPedidos.use(express.json());
 // Ruta para ver todos los pedidos realizados
 routerPedidos.get('/:id', verificadoAutentication, verPedido)
 
+// Ruta para que el administrador pueda ver todo los pedidos
+routerPedidos.get('/admin/mostrar', verificadoAdministrador, mostrarPedidosAdministrador)
+
+// Ruta para que el administrador pueda buscar un pedido
+routerPedidos.get('/admin/mostrar/:id', verificadoAdministrador, buscarPedidoAdministrador)
+
 // Ruta para ver todos los pedidos realizados
 routerPedidos.post('/mostrar', verificadoAutentication, mostrarPedidos);
 
@@ -30,13 +40,13 @@ routerPedidos.post('/mostrar', verificadoAutentication, mostrarPedidos);
 routerPedidos.post('/buscar/:id', verificadoAutentication, buscarPedido);
 
 // Ruta para registrar el pedido
-routerPedidos.post('/registro', registroPedido);
+routerPedidos.post('/registro', verificadoAutentication, registroPedido);
 
 // Ruta para ver todos los productos del pedido
 routerPedidos.post('/listar', verificadoAutentication, listarProductosPedido);
 
 // Ruta para agregar un producto al pedido
-routerPedidos.post('/agregar', agregarProductoPedido);
+routerPedidos.post('/agregar', verificadoAutentication, agregarProductoPedido);
 
 // Ruta para borrar un producto del pedido
 routerPedidos.post('/borrar/:id', verificadoAutentication, borrarProductoPedido);

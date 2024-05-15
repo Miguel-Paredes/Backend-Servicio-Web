@@ -1,15 +1,13 @@
-// Creamos una variable 
-let sesion = false
-
-// Creamos una funcion que verifica si el administrador inicio sesion o no
-const verifAdministrador = (inicioAdministrador) => {
-  sesion = inicioAdministrador
-}
+// Importamos el modelo Registro
+const Registro = require('../models/login.js');
 
 // Metodo para proteger las rutas del administrador
-const verificadoAdministrador = (req, res, next) => {
+const verificadoAdministrador = async (req, res, next) => {
+  const cliente = req.body.cliente
+  // Buscamos en el la bdd si el administrador inicio sesion o no
+  const sesion = await Registro.findOne({cliente})
   // Si existe un inicio de sesion del administrador
-  if(sesion  == true){
+  if(sesion.inicioSesion == true && sesion.admin == true){
     // Continuar
     return next();
   }else{
@@ -19,7 +17,4 @@ const verificadoAdministrador = (req, res, next) => {
 }
 
 // Exportamos la proteccion de las rutas del administrador
-module.exports = {
-  verificadoAdministrador,
-  verifAdministrador
-}
+module.exports = verificadoAdministrador
