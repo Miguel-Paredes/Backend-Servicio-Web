@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 // Creamos el modelo para mongo con los campos que se van a utilizar
 const favoritoSchema = new mongoose.Schema({
     _id : mongoose.Schema.Types.ObjectId,
+    // TODO
     producto : {
         type : mongoose.Schema.Types.ObjectId,
         ref : "Producto",
@@ -14,6 +15,7 @@ const favoritoSchema = new mongoose.Schema({
         ref : "Registro",
         required : true
     }
+    // TODO
 });
 
 // Copiamos los campos del modelo Producto en el modelo Favorito

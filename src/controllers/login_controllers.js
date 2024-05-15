@@ -194,41 +194,6 @@ const cierreSesionLogin = async (req, res) => {
   }
 };
 
-function cierreSesionGlobal(hora, minuto, segundo, callback) {
-  setInterval(function() {
-    const now = new Date();
-    const currentHour = now.getHours();
-    const currentMinute = now.getMinutes();
-    const currentSecond = now.getSeconds();
-    if (currentHour === hora && currentMinute === minuto && currentSecond === segundo) {
-      callback();
-    }
-  }, 1000); // Comprueba cada segundo
-}
-
-// El codigo se ejecutara a las 5:00 am hora Ecuador
-cierreSesionGlobal(5, 0,0, function() {
-  cierreSesion()
-  console.log('Cerradas todas las sesiones de usuario');
-  // Aquí puedes colocar el código que deseas ejecutar
-});
-
-const cierreSesion = async() =>{
-  try {
-    // Buscamos el correo en la base de datos
-    const user = await Registro.find();
-    for (i = 0 ; i < user.length ; i++){
-      // Cerramos la sesion
-      await Registro.findByIdAndUpdate(user[i]._id, {inicioSesion : false}, { new : true})
-    }
-  } catch (err) {
-    // En caso de haber un error, indicamos que no se pudo cerrar la sesión del usuario
-    console.log({ message: 'Error al cerrar las sesiónes del usuario' });
-    // Mostramos el error
-    console.log(err);
-  }
-}
-
 // Exportamos los controladores
 module.exports = {
     inicioLogin,

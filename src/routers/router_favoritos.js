@@ -5,7 +5,8 @@ const {
     mostrarFavoritos,
     buscarFavorito,
     registrarFavorito,
-    borrarFavorito
+    borrarFavorito,
+    categoriaFavorito
 } = require('../controllers/favoritos_controllers');
 // Importamos la autentificacion
 const verificadoAutentication = require('../helpers/autenticacion');
@@ -21,6 +22,9 @@ routerFavoritos.post('/listar', verificadoAutentication, mostrarFavoritos);
 
 // Ruta para buscar un favoritos
 routerFavoritos.post('/buscar/:id', verificadoAutentication, buscarFavorito);
+
+// Ruta para buscat favoritos por categoria
+routerFavoritos.post('/categoria/:categoria', verificadoAutentication, categoriaFavorito);
 
 // Ruta para crear un nuevo favoritos
 routerFavoritos.post('/registro', verificadoAutentication, registrarFavorito);

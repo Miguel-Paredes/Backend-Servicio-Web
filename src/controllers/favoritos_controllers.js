@@ -210,6 +210,35 @@ const actualizarCategoriaFavorito = async (CategoriaId, categoria) => {
     }
 };
 
+const categoriaFavorito = async (req, res) => {
+    // Obtenemos el valor de la url
+    let categoriaID = req.params.categoria
+    // Colocamos el nombre en mayuscula
+    categoriaID += categoriaID.toUpperCase()
+    // Obtenemos el id del cliente del body
+    const cliente = req.body.cliente
+    try{
+        // Buscamos en la base de datos ese Favorito
+        const Favoritos = await Favorito.find({ categoriaID, cliente })
+        // En caso de que no exista ese Favorito enviamos un mensaje
+        if (!Favoritos || Favoritos.length === 0) return res.json({ message: 'No existe ese Favorito' });
+        // Modificamos el nombre del Favorito para tener la primera inicial en mayúscula y las demás en minúscula
+        const listarFavoritos = Favoritos.map(Favorito => {
+            const nombreFavorito = Favorito.nombre.charAt(0).toUpperCase() + Favorito.nombre.slice(1).toLowerCase();
+            const descripcionFavorito = Favorito.descripcion.charAt(0).toUpperCase() + Favorito.descripcion.slice(1).toLowerCase();
+            const categoriaFavorito = Favorito.categoria.charAt(0).toUpperCase() + Favorito.categoria.slice(1).toLowerCase();
+            return { ...Favorito.toObject(), nombre: nombreFavorito, descripcion: descripcionFavorito, categoria: categoriaFavorito };
+        });
+        // Mostramos el Favorito
+        res.status(200).json(listarFavoritos);
+    }catch (err){
+        // Enviamos un mensaje de error en caso de que no se puedan mostrar el Favorito
+        res.status(500).json({ message : 'Error al obtener el Favorito'})
+        // Mostramos los errores
+        console.log(err)
+    }
+}
+
 // Exportamos los controladores
 module.exports = {
     mostrarFavoritos,
@@ -218,5 +247,6 @@ module.exports = {
     actualizarFavorito,
     borrarFavorito,
     eliminarFavorito,
-    actualizarCategoriaFavorito
+    actualizarCategoriaFavorito,
+    categoriaFavorito
 }

@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 // Creamos el modelo para mongo con los campos que se van a utilizar
 const productoSchema = new mongoose.Schema({
     _id : mongoose.Schema.Types.ObjectId,
+    // TODO
     nombre : { type : String, required : true, unique : true, trim : true },
     precio : { type : Number, required : true, trim : true },
     cantidad : { type : Number, required : true},
@@ -15,6 +16,7 @@ const productoSchema = new mongoose.Schema({
       trim : true
      },
     imagen : { public_id : String, secure_url : String}
+    // TODO
 });
 
 // Middleware pre-save para convertir los valores a mayúsculas

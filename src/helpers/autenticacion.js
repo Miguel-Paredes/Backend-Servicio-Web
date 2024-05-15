@@ -11,7 +11,7 @@ const verificadoAutentication = async (req, res, next) => {
   // Buscamos en el la bdd si el cajero inicio sesion o no
   const Cajeros = await Cajero.findOne({cliente})
   // Si existe un inicio de sesion
-  if((sesion.inicioSesion == true && sesion.admin == false) || (Cajeros.inicioSesion == true)){
+  if((sesion.inicioSesion == true && sesion.admin == false) || (Cajero.inicioSesion == true)){
     // Continuar
     return next();
   }else{

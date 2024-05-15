@@ -4,6 +4,7 @@ const mongoose = require('mongoose')
 // Creamos el modelo para mongo con los campos que se van a utilizar
 const pedidoProductosSchema = mongoose.Schema({
     _id : mongoose.Schema.Types.ObjectId,
+    // TODO
     cliente : {
         type : mongoose.Schema.Types.ObjectId,
         ref : "Registro",
@@ -17,6 +18,7 @@ const pedidoProductosSchema = mongoose.Schema({
     },
     cantidad : { type : Number, require : true, trim : true },
     precio : { type : Number, require : true, trim : true }
+    // TODO
 }); 
 
 // Exportamos el modelo

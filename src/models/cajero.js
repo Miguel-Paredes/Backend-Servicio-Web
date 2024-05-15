@@ -8,10 +8,12 @@ const saltRounds = 10;
 
 // Creamos el modelo para mongo con los campos que se van a utilizar
 const CajeroSchema = new mongoose.Schema({
+  // TODO
   username : { type : String, required : true },
   password : { type : String, required : true },
   email : { type : String, require  : true, unique  : true},
   telefono : { type : Number, require : true, unique : true },
+  // TODO
   inicioSesion : { type : Boolean, default : false }
 });
 

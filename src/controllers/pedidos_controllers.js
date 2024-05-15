@@ -43,6 +43,8 @@ const agregarProductoPedido = async (req, res) => {
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
         // En caso de que se encuentre ese producto en el pedido enviamos un mensaje
         if(busProductoPedido) return res.json({ message : 'Ese producto ya esta en el pedido' })
+        // Verificamos en stock que cantidad de producto tenemos
+        if(cantidad <= busProducto.cantidad) return res.json({ message : `Solo tenemos en stock ${busProducto.cantidad}`})
         // En caso de que no se hallan realizado pedidos agregamos el primer producto a un cliente
         const nuevoProductoPedido = new PedidoProductos({
             _id : new mongoose.Types.ObjectId,
@@ -95,6 +97,8 @@ const actualizarProductoPedido = async (req, res) => {
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
         // En caso de que no se encuentre ese producto en el pedido enviamos un mensaje
         if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'No existe ese producto en el pedido' })
+        // Verificamos en stock que cantidad de producto tenemos
+        if(cantidad <= busProducto.cantidad) return res.json({ message : `Solo tenemos en stock ${busProducto.cantidad}`})
         // Actualizamos el producto
         const productoPedidoActualizado = await PedidoProductos.findByIdAndUpdate(
             busProductoPedido._id,
@@ -184,6 +188,8 @@ const listarProductosPedido = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades clientes en una variable
     const cliente = req.body.cliente
+    // Creamos una variable para calcular el total del pedido
+    let total = 0
     // Validar todos los campos llenos
     if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
     try{
@@ -204,7 +210,19 @@ const listarProductosPedido = async (req, res) => {
                 'Cantidad' : busProductoPedido[i].cantidad,
                 'Precio' : busProductoPedido[i].precio
             })
+            // Sacamos el precio del producto
+            const precio = busProductoPedido[i].precio
+            // Sacamos la cantidad del producto
+            const cantidad = busProductoPedido[i].cantidad
+            // Calculamos el valor
+            const subtotal = precio*cantidad
+            // Almacenamos en total
+            total += subtotal
         }
+        // Mostramos el total
+        mostrar[busCliente._id].push({
+            'Total' : total
+        })
         // Mostramos todo el pedido
         res.json({ Pedido : mostrar})
     }catch(err){
