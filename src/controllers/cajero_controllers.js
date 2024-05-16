@@ -1,7 +1,7 @@
 // Importamos el modelo de Cajero
 const Cajero = require("../models/cajero");
 
-const inicioCajero = async (req, res) => {
+const inicioCajero = async (req, res, next) => {
   // Desestructuramos el objeto req.body
   // Extraemos las propiedades email y password en variables separadas 
   const { email, password } = req.body;
@@ -10,6 +10,7 @@ const inicioCajero = async (req, res) => {
   try {
     // Buscamos el correo en la base de datos
     const user = await Cajero.findOne({ email });
+    if(!user || user.lenght === 0) return next();
     // En caso de que el cajero ya haya iniciado sesion
     if(user.inicioSesion == true) return res.json({ message : 'El Cajero ya inicio sesion'})
     // Desincriptamos la contraseña
@@ -55,7 +56,7 @@ const crearCajero = async (req, res) => {
     // Guardamos el nuevo Usuario en la base de datos
     await user.save();
     // Enviamos un mensaje que verifique su correo, si todo esta en orden
-    res.status(200).json({ message: 'Cajero creado' });
+    res.status(200).json({ message: 'Cajero creado', Cajero : user });
   }catch(err){
     // Enviamos un mensaje de error en caso de que no se puedo crear el Cajero
     res.json({ message : 'Error al crear el Cajero' })
@@ -78,8 +79,8 @@ const actualizarCajero = async (req, res) => {
             res.json({ message : 'No existe ese Cajero' })
         }else{
             // Si existe actualizamos y enviamos un mensaje
-            await Cajero.findByIdAndUpdate(exisCorreo._id, req.body, { new : true })
-            res.json({ message : 'Cajero Actualizado' })
+            const user = await Cajero.findByIdAndUpdate(exisCorreo._id, req.body, { new : true })
+            res.json({ message : 'Cajero Actualizado', Cajero : user })
         }
     }catch(err){
         // Enviamos un mensaje de error en caso de que no se puedo actualizar el Cajero
@@ -145,11 +146,41 @@ const buscarCajero = async (req, res) => {
     }
 }
 
+const cierreSesionCajero = async (req, res, next) => {
+    // Desestructuramos el objeto req.body
+    // Extraemos la propiedad email en una variable
+    const { email } = req.body;
+    // Validar todos los campos llenos
+    if (Object.values(req.body).includes('')) return res.status(400).json({msg:'Lo sentimos, debes llenar todos los campos'})
+    try {
+      // Buscamos el correo en la base de datos
+      const user = await Cajero.findOne({ email });
+      if(!user || user.lenght === 0) return next();
+      // En caso de que el cajero ya haya iniciado sesion
+      else if(user.inicioSesion == false) return res.json({ message : 'El Cajero no inicio sesion'})
+      // En caso de que el usuario sea incorrecto indicamos enviamos un mensaje
+      else if (!user) return res.status(500).json({ message : 'Correo incorrecto'})
+      // En caso de que todo este en orden enviamos un mensaje
+      else{
+          // Actualizamos el campo de inicio de sesion en true
+          await Cajero.findByIdAndUpdate(user._id, {inicioSesion : false}, { new : true})
+          // Enviamos un mensaje de que se autentico el usuario
+          res.redirect(`${process.env.URL}/login`);
+      }
+    }catch(err){
+      // Enviamos un mensaje de error en caso de que no se puedo autenticar el Cajero
+      res.json({ message : 'Error al autenticar Cajero'})
+      // Mostramos los errores
+      console.log(err)
+    }
+  }
+
 module.exports = {
     inicioCajero,
     crearCajero,
     actualizarCajero,
     borrarCajero,
     mostrarCajeros,
-    buscarCajero
+    buscarCajero,
+    cierreSesionCajero
 }

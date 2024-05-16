@@ -17,6 +17,8 @@
     const routerCategoria = require('./routers/router_categoria.js')
     // Importamos routerLogin para manejar las solicitudes a la ruta /api/pedidos
     const routerPedidos = require('./routers/router_pedidos.js')
+    // Importamos routerLogin para manejar las solicitudes a la ruta /api/cajeros
+    const routerCajero = require('./routers/router_cajero.js')
 
 // Inicializaciones
     // Creamos una variable que nos permita usar express
@@ -51,6 +53,8 @@
     app.use('/api/categoria', routerCategoria)
     // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/pedidos
     app.use('/api/pedidos', routerPedidos)
+    // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/cajeros
+    app.use('/api/cajeros', routerCajero)
 
     // Manejo de rutas en caso de que no sean encontradas
     app.use((req, res) => res.status(404).end())

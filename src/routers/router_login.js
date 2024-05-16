@@ -14,6 +14,11 @@ const {
 
 // Importamos la validacion de campos
 const validacion = require('../middlewares/validacion.js');
+// Importamos los controladores del cajero
+const {
+    inicioCajero,
+    cierreSesionCajero
+} = require('../controllers/cajero_controllers.js');
 
 // Importamos Router para crear el router de ingreso
 const routerLogin = express.Router()
@@ -25,7 +30,7 @@ administrador()
 routerLogin.use(express.json())
 
 // Ruta para iniciar sesion
-routerLogin.post('/', inicioLogin)
+routerLogin.post('/', inicioCajero, inicioLogin)
 
 // Ruta para registrar un nuevo usuario
 routerLogin.post('/registro', validacion, registroLogin)
@@ -43,7 +48,7 @@ routerLogin.get('/recuperar-password/:token', comprobarTokenPasword)
 routerLogin.post('/nuevo-password/:token', nuevoPassword)
 
 // Ruta para cerrar la sesion
-routerLogin.post('/cierre', cierreSesionLogin)
+routerLogin.post('/cierre', cierreSesionCajero, cierreSesionLogin)
 
 // Exportamos routerLogin
 module.exports = routerLogin
