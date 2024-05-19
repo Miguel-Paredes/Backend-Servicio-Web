@@ -2,7 +2,7 @@
 const mongoose = require('mongoose')
 
 // Creamos el modelo para mongo con los campos que se van a utilizar
-const pedidoProductosSchema = mongoose.Schema({
+const CarritoSchema = mongoose.Schema({
     _id : mongoose.Schema.Types.ObjectId,
     // TODO
     cliente : {
@@ -22,4 +22,4 @@ const pedidoProductosSchema = mongoose.Schema({
 }); 
 
 // Exportamos el modelo
-module.exports = mongoose.model('PedidoProductos', pedidoProductosSchema);
+module.exports = mongoose.model('Carrito', CarritoSchema);

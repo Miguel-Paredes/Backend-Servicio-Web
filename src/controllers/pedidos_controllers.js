@@ -10,8 +10,8 @@ const Producto = require ('../models/productos.js')
 // Importamos el modelo Registro
 const Registro = require ('../models/login.js')
 
-// Importamos el modelo PedidoProductos
-const PedidoProductos = require ('../models/pedido_producto.js');
+// Importamos el modelo Carrito
+const Carrito = require ('../models/carrito.js');
 
 // Importamos sendMailToConfirmBuyOfUser, sendMailToAdmin
 const { sendMailToConfirmBuyOfUser, sendMailToAdmin } = require('../config/nodemailer.js');
@@ -36,7 +36,7 @@ const agregarProductoPedido = async (req, res) => {
         // Almacenamos el nombre del producto
         const veriProducto = busProducto.nombre
         // Buscamos el producto del pedido en la base de datos
-        const busProductoPedido = await PedidoProductos.findOne({producto : veriProducto})
+        const busProductoPedido = await Carrito.findOne({producto : veriProducto})
         // En caso de que no se encuentre ese producto enviamos un mensaje
         if(!busProducto || busProducto.length === 0) return res.json({ message : 'No existe ese producto' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
@@ -46,7 +46,7 @@ const agregarProductoPedido = async (req, res) => {
         // Verificamos en stock que cantidad de producto tenemos
         if(cantidad <= busProducto.cantidad) return res.json({ message : `Solo tenemos en stock ${busProducto.cantidad}`})
         // En caso de que no se hallan realizado pedidos agregamos el primer producto a un cliente
-        const nuevoProductoPedido = new PedidoProductos({
+        const nuevoProductoPedido = new Carrito({
             _id : new mongoose.Types.ObjectId,
             cliente : cliente,
             producto : busProducto.nombre,
@@ -90,7 +90,7 @@ const actualizarProductoPedido = async (req, res) => {
         // Almacenamos el nombre del producto
         const veriProducto = busProducto.nombre
         // Buscamos el producto del pedido en la base de datos
-        const busProductoPedido = await PedidoProductos.findOne({producto : veriProducto, cliente : cliente})
+        const busProductoPedido = await Carrito.findOne({producto : veriProducto, cliente : cliente})
         // En caso de que no se encuentre ese producto enviamos un mensaje
         if(!busProducto || busProducto.length === 0) return res.json({ message : 'No existe ese producto' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
@@ -100,7 +100,7 @@ const actualizarProductoPedido = async (req, res) => {
         // Verificamos en stock que cantidad de producto tenemos
         if(cantidad <= busProducto.cantidad) return res.json({ message : `Solo tenemos en stock ${busProducto.cantidad}`})
         // Actualizamos el producto
-        const productoPedidoActualizado = await PedidoProductos.findByIdAndUpdate(
+        const productoPedidoActualizado = await Carrito.findByIdAndUpdate(
             busProductoPedido._id,
             {cantidad},
             { new : true}
@@ -138,7 +138,7 @@ const borrarProductoPedido = async (req, res) => {
         // Almacenamos el nombre del producto
         const veriProducto = busProducto.nombre
         // Buscamos el producto del pedido en la base de datos
-        const busProductoPedido = await PedidoProductos.findOne({producto : veriProducto, cliente : cliente})
+        const busProductoPedido = await Carrito.findOne({producto : veriProducto, cliente : cliente})
         // En caso de que no se encuentre ese producto enviamos un mensaje
         if(!busProducto || busProducto.length === 0) return res.json({ message : 'No existe ese producto' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
@@ -146,7 +146,7 @@ const borrarProductoPedido = async (req, res) => {
         // En caso de que no se encuentre ese producto en el pedido enviamos un mensaje
         if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'No existe ese producto en el pedido' })
         // Buscamos el producto y lo eliminamos
-        await PedidoProductos.findByIdAndDelete(busProductoPedido._id)
+        await Carrito.findByIdAndDelete(busProductoPedido._id)
         // Enviamos un mensaje indicando que se borro el producto
         res.json({ message : 'Producto borrado del pedido' })
     }catch(err){
@@ -167,13 +167,13 @@ const eliminarPedido = async (req, res) => {
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
         // Buscamos los producto del pedido en la base de datos
-        const busProductoPedido = await PedidoProductos.find({ cliente : cliente})
+        const busProductoPedido = await Carrito.find({ cliente : cliente})
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'Ese cliente no se encuentra haciendo un pedido' })
         for(i = 0 ; i < busProductoPedido.length ; i++){
-            const eliminarPedido = await PedidoProductos.findByIdAndDelete(busProductoPedido[i]._id)
+            await Carrito.findByIdAndDelete(busProductoPedido[i]._id)
         }
         res.json({ message : 'Pedido eliminado' })
     }catch(err){
@@ -196,7 +196,7 @@ const listarProductosPedido = async (req, res) => {
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
         // Buscamos los producto del pedido en la base de datos
-        const busProductoPedido = await PedidoProductos.find({ cliente : cliente})
+        const busProductoPedido = await Carrito.find({ cliente : cliente})
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
@@ -323,7 +323,7 @@ const registroPedido = async (req, res) => {
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
         // Buscamos los productos del pedido en la base de datos
-        const busProductoPedido = await PedidoProductos.find({ cliente : cliente})
+        const busProductoPedido = await Carrito.find({ cliente : cliente})
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
         // En caso de que no se encuentre ese producto en el pedido enviamos un mensaje
@@ -363,8 +363,8 @@ const registroPedido = async (req, res) => {
             mostrar[busCliente._id][0].Producto.push(nombreProducto)
             mostrar[busCliente._id][0].Cantidad.push(cantidad)
             mostrar[busCliente._id][0].Precio.push(precio)
-            // Vamos eliminando cada producto de la coleccion PedidoProductos
-            await PedidoProductos.findByIdAndDelete(busProductoPedido[i]._id)
+            // Vamos eliminando cada producto de la coleccion Carrito
+            await Carrito.findByIdAndDelete(busProductoPedido[i]._id)
         }
         mostrar[busCliente._id].push({
             'Total' : total,
