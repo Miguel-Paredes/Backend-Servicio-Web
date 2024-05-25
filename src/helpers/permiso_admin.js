@@ -3,9 +3,9 @@ const Registro = require('../models/login.js');
 
 // Metodo para proteger las rutas del administrador
 const verificadoAdministrador = async (req, res, next) => {
-  const admin = true
+  const cliente = req.body.cliente
   // Buscamos en el la bdd si el administrador inicio sesion o no
-  const sesion = await Registro.findOne({ admin : admin })
+  const sesion = await Registro.findOne({ _id : cliente })
   // Si existe un inicio de sesion del administrador
   if(sesion.inicioSesion == true && sesion.admin == true){
     // Continuar
