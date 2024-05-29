@@ -32,8 +32,5 @@ routerFavoritos.post('/favoritos/registro', verificadoAutentication, registrarFa
 // Ruta para borrar un favoritos
 routerFavoritos.post('/favoritos/borrar/:id', verificadoAutentication, borrarFavorito);
 
-// Manejo de rutas en caso de que no sean encontradas
-routerFavoritos.use((req, res) => res.status(404).end());
-
 // Exportamos routerFavoritos
 module.exports = routerFavoritos;

@@ -32,8 +32,5 @@ routerCategoria.put('/categoria/actualizar/:id', verificadoAdministrador, actual
 // Ruta para ver borrar una categoria
 routerCategoria.delete('/categoria/borrar/:id', verificadoAdministrador, borrarCategoria);
 
-// Manejo de rutas en caso de que no sean encontradas
-routerCategoria.use((req, res) => res.status(404).end());
-
 // Exportamos routerCategoria
 module.exports = routerCategoria;

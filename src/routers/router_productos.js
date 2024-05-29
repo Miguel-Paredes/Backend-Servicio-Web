@@ -36,8 +36,5 @@ routerProductos.put('/productos/actualizar/:id', verificadoAdministrador, actual
 // Ruta para borrar un producto
 routerProductos.delete('/productos/borrar/:id', verificadoAdministrador, borrarProducto);
 
-// Manejo de rutas en caso de que no sean encontradas
-routerProductos.use((req, res) => res.status(404).end());
-
 // Exportamos routerProductos
 module.exports = routerProductos;
