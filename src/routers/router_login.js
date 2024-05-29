@@ -30,25 +30,25 @@ administrador()
 routerLogin.use(express.json())
 
 // Ruta para iniciar sesion
-routerLogin.post('/', inicioCajero, inicioLogin)
+routerLogin.post('/login/', inicioCajero, inicioLogin)
 
 // Ruta para registrar un nuevo usuario
-routerLogin.post('/registro', validacion, registroLogin)
+routerLogin.post('/login/registro', validacion, registroLogin)
 
 // Ruta para confirmar el correo
-routerLogin.get('/confirmar/:token', confirmEmail)
+routerLogin.get('/login/confirmar/:token', confirmEmail)
 
 // Ruta para recuperar contraseña
-routerLogin.post('/recuperar-password', recuperarPassword)
+routerLogin.post('/login/recuperar-password', recuperarPassword)
 
 // Ruta para recuperar la contraseña con token
-routerLogin.get('/recuperar-password/:token', comprobarTokenPasword)
+routerLogin.get('/login/recuperar-password/:token', comprobarTokenPasword)
 
 // Ruta para crear una nueva contraseña
-routerLogin.post('/nuevo-password/:token', nuevoPassword)
+routerLogin.post('/login/nuevo-password/:token', nuevoPassword)
 
 // Ruta para cerrar la sesion
-routerLogin.post('/cierre', cierreSesionCajero, cierreSesionLogin)
+routerLogin.post('/login/cierre', cierreSesionCajero, cierreSesionLogin)
 
 // Exportamos routerLogin
 module.exports = routerLogin

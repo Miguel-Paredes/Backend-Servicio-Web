@@ -29,7 +29,7 @@
 // Configuraciones
     // Configuramos una variable dentro de app que almacena
     // el puerto en el cual se va a alzar el servidor
-    app.set('port', process.env.port || 30000)
+    app.set('port', process.env.port || 3000)
     // Habilitamos el middleware de CORS para permitir solicitudes de diferentes orígenes
     app.use(cors())
     // Establecer la carpeta temporal y el directorio
@@ -44,17 +44,17 @@
 
 // Rutas
     // Utilizamos routerProductos para manejar las solicitudes a la ruta /api/productos
-    app.use('/api/productos', routerProductos)
+    app.use('/api', routerProductos)
     // Utilizamos routerFavoritos para manejar las solicitudes a la ruta /api/favoritos
-    app.use('/api/favoritos', routerFavoritos)
+    app.use('/api', routerFavoritos)
     // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/login
-    app.use('/api/login', routerLogin)
+    app.use('/api', routerLogin)
     // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/categoria
-    app.use('/api/categoria', routerCategoria)
+    app.use('/api', routerCategoria)
     // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/pedidos
-    app.use('/api/pedidos', routerPedidos)
+    app.use('/api', routerPedidos)
     // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/cajeros
-    app.use('/api/cajeros', routerCajero)
+    app.use('/api', routerCajero)
 
     // Manejo de rutas en caso de que no sean encontradas
     app.use((req, res) => res.status(404).end())

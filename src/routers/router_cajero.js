@@ -21,19 +21,19 @@ const routerCajero = express.Router()
 routerCajero.use(express.json())
 
 // Ruta para registrar un cajero
-routerCajero.post('/registro', validacion, verificadoAdministrador, crearCajero )
+routerCajero.post('/cajeros/registro', validacion, verificadoAdministrador, crearCajero )
 
 // Ruta para actualizar un cajero
-routerCajero.put('/actualizar', validacion, verificadoAdministrador, actualizarCajero)
+routerCajero.put('/cajeros/actualizar', validacion, verificadoAdministrador, actualizarCajero)
 
 // Ruta para borrar un cajero
-routerCajero.delete('/eliminar', verificadoAdministrador, borrarCajero)
+routerCajero.delete('/cajeros/eliminar', verificadoAdministrador, borrarCajero)
 
 // Ruta para mostrar los cajeros
-routerCajero.get('/mostrar', verificadoAdministrador, mostrarCajeros)
+routerCajero.get('/cajeros/mostrar', verificadoAdministrador, mostrarCajeros)
 
 // Ruta para buscar un cajero
-routerCajero.get('/buscar/:id', verificadoAdministrador, buscarCajero)
+routerCajero.get('/cajeros/buscar/:id', verificadoAdministrador, buscarCajero)
 
 // Exportamos routerCajero
 module.exports = routerCajero

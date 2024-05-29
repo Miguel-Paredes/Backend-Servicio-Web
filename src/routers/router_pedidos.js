@@ -25,37 +25,37 @@ const routerPedidos = express.Router();
 routerPedidos.use(express.json());
 
 // Ruta para ver todos los pedidos realizados
-routerPedidos.get('/:id', verificadoAutentication, verPedido)
+routerPedidos.get('/pedidos/:id', verificadoAutentication, verPedido)
 
 // Ruta para que el administrador pueda ver todo los pedidos
-routerPedidos.get('/admin/mostrar', verificadoAdministrador, mostrarPedidosAdministrador)
+routerPedidos.get('/pedidos/admin/mostrar', verificadoAdministrador, mostrarPedidosAdministrador)
 
 // Ruta para que el administrador pueda buscar un pedido
-routerPedidos.get('/admin/mostrar/:id', verificadoAdministrador, buscarPedidoAdministrador)
+routerPedidos.get('/pedidos/admin/mostrar/:id', verificadoAdministrador, buscarPedidoAdministrador)
 
 // Ruta para ver todos los pedidos realizados
-routerPedidos.post('/mostrar', verificadoAutentication, mostrarPedidos);
+routerPedidos.post('/pedidos/mostrar', verificadoAutentication, mostrarPedidos);
 
 // Ruta para ver buscar un pedido realizado
-routerPedidos.post('/buscar/:id', verificadoAutentication, buscarPedido);
+routerPedidos.post('/pedidos/buscar/:id', verificadoAutentication, buscarPedido);
 
 // Ruta para registrar el pedido
-routerPedidos.post('/registro', verificadoAutentication, registroPedido);
+routerPedidos.post('/pedidos/registro', verificadoAutentication, registroPedido);
 
 // Ruta para ver todos los productos del pedido
-routerPedidos.post('/listar', verificadoAutentication, listarProductosPedido);
+routerPedidos.post('/pedidos/listar', verificadoAutentication, listarProductosPedido);
 
 // Ruta para agregar un producto al pedido
-routerPedidos.post('/agregar', verificadoAutentication, agregarProductoPedido);
+routerPedidos.post('/pedidos/agregar', verificadoAutentication, agregarProductoPedido);
 
 // Ruta para borrar un producto del pedido
-routerPedidos.post('/borrar/:id', verificadoAutentication, borrarProductoPedido);
+routerPedidos.post('/pedidos/borrar/:id', verificadoAutentication, borrarProductoPedido);
 
 // Ruta para actualizar algun producto del pedido
-routerPedidos.post('/actualizar/:id', verificadoAutentication, actualizarProductoPedido);
+routerPedidos.post('/pedidos/actualizar/:id', verificadoAutentication, actualizarProductoPedido);
 
 // Ruta para eliminar todo el pedido
-routerPedidos.post('/eliminar', verificadoAutentication, eliminarPedido);
+routerPedidos.post('/pedidos/eliminar', verificadoAutentication, eliminarPedido);
 
 // Exportamos routerPedidos
 module.exports = routerPedidos

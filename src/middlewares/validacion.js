@@ -3,19 +3,26 @@ const { check, validationResult } = require('express-validator');
 
 const validacion = [
   // Validación para los campos 'username', 'email' y 'password'
-  check(["username", "email", "password"])
+  check(["nombre", "apellido", "email", "password"])
     .exists()
-    .withMessage('Los campos "username", "email" y/o "password" son obligatorios')
+    .withMessage('Los campos "nombre", "apellido", "email" y/o "password" son obligatorios')
     .notEmpty()
-    .withMessage('Los campos "username", "email" y/o "password" no pueden estar vacíos')
+    .withMessage('Los campos "nombre", "apellido", "email" y/o "password" no pueden estar vacíos')
     .customSanitizer(value => value?.trim()),
   // Validación para el campo 'username'
-  check("username")
+  check("nombre")
     .isLength({ min: 3, max: 20 })
-    .withMessage('El campo "username" debe tener entre 3 y 20 caracteres')
+    .withMessage('El campo "nombre" debe tener entre 3 y 20 caracteres')
     .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
     .withMessage('El campo "username" debe contener solo letras y espacios')
     .customSanitizer(value => value?.trim()),
+  // Validación para el campo 'apellido'
+  check("apellido")
+    .isLength({ min: 3, max: 20 })
+    .withMessage('El campo "apellido" debe tener entre 3 y 20 caracteres')
+    .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
+    .withMessage('El campo "apellido" debe contener solo letras y espacios')
+    .customSanitizer(value => value.trim()),
   // Validación para el campo 'email'
   check("email")
     .isEmail()

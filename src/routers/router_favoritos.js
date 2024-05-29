@@ -18,19 +18,19 @@ const routerFavoritos = express.Router();
 routerFavoritos.use(express.json());
 
 // Ruta para ver todos los favoritos
-routerFavoritos.post('/listar', verificadoAutentication, mostrarFavoritos);
+routerFavoritos.post('/favoritos/listar', verificadoAutentication, mostrarFavoritos);
 
 // Ruta para buscar un favoritos
-routerFavoritos.post('/buscar/:id', verificadoAutentication, buscarFavorito);
+routerFavoritos.post('/favoritos/buscar/:id', verificadoAutentication, buscarFavorito);
 
 // Ruta para buscat favoritos por categoria
-routerFavoritos.post('/categoria/:categoria', verificadoAutentication, categoriaFavorito);
+routerFavoritos.post('/favoritos/categoria/:categoria', verificadoAutentication, categoriaFavorito);
 
 // Ruta para crear un nuevo favoritos
-routerFavoritos.post('/registro', verificadoAutentication, registrarFavorito);
+routerFavoritos.post('/favoritos/registro', verificadoAutentication, registrarFavorito);
 
 // Ruta para borrar un favoritos
-routerFavoritos.post('/borrar/:id', verificadoAutentication, borrarFavorito);
+routerFavoritos.post('/favoritos/borrar/:id', verificadoAutentication, borrarFavorito);
 
 // Manejo de rutas en caso de que no sean encontradas
 routerFavoritos.use((req, res) => res.status(404).end());

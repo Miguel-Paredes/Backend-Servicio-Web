@@ -71,6 +71,7 @@ const registroLogin = async (req, res) => {
     await user.save();
     // Enviamos un mensaje que verifique su correo, si todo esta en orden
     res.status(200).json({ message: 'Revisa tu correo electrónico para confirmar tu cuenta' });
+    console.log(user)
   } catch (err) {
     // Enviamos un mensaje de error en caso de que no se pueda registrar el usuario
     res.status(500).json({ error: 'Error al registrar el usuario' });
@@ -154,18 +155,20 @@ const nuevoPassword = async (req, res) => {
 
 const administrador = async (req, res) => {
   // Creamos las credenciales para el administrador
-  const username = 'admin';
+  const nombre = 'Administrador';
+  const apellido = 'Minimarket';
   const password = 'Minimarket2024';
+  const direccion = ''
   const email = process.env.EMAIL_ADMINISTRADOR;
   const telefono = process.env.CELULAR_ADMINISTRADOR;
   const confirmEmail = true;
   const admin = true;
   try {
     // Buscamos si ya hay el usuario del administrador
-    const buscarUsername = await Registro.find({ username });
+    const buscarUsername = await Registro.find({ nombre });
     // En caso de que no este creada le creamos
     if (buscarUsername.length === 0) {
-      const user = new Registro({ username, password, email, confirmEmail, admin, telefono });
+      const user = new Registro({ nombre, apellido, direccion, password, email, confirmEmail, admin, telefono });
       await user.save();
     }
   } catch (error) {

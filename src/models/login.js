@@ -9,10 +9,12 @@ const saltRounds = 10;
 // Creamos el modelo para mongo con los campos que se van a utilizar
 const RegistroSchema = new mongoose.Schema({
   // TODO
-  username : { type : String, required : true },
+  nombre : { type : String, required : true },
+  apellido : { type : String, required : true },
   password : { type : String, required : true },
   email : { type : String, require  : true, unique  : true},
   telefono : { type : Number, require : true, unique : true },
+  direccion : { type : String, require : true},
   // TODO
   token : { type : String, default : null },
   confirmEmail : { type : Boolean, default : false },

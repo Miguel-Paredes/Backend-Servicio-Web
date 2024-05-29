@@ -19,22 +19,22 @@ const routerProductos = express.Router();
 routerProductos.use(express.json());
 
 // Ruta para ver todos los productos
-routerProductos.get('/listar', mostrarProductos);
+routerProductos.get('/productos/listar', mostrarProductos);
 
 // Ruta para buscar un producto
-routerProductos.get('/buscar/:id', buscarProducto);
+routerProductos.get('/productos/buscar/:id', buscarProducto);
 
 // Ruta para buscar productos por categoria
-routerProductos.get('/categoria/:id', categoriaProducto)
+routerProductos.get('/productos/categoria/:id', categoriaProducto)
 
 // Ruta para crear un nuevo producto
-routerProductos.post('/registro', verificadoAdministrador, registrarProducto);
+routerProductos.post('/productos/registro', verificadoAdministrador, registrarProducto);
 
 // Ruta para actualizar un producto
-routerProductos.put('/actualizar/:id', verificadoAdministrador, actualizarProducto);
+routerProductos.put('/productos/actualizar/:id', verificadoAdministrador, actualizarProducto);
 
 // Ruta para borrar un producto
-routerProductos.delete('/borrar/:id', verificadoAdministrador, borrarProducto);
+routerProductos.delete('/productos/borrar/:id', verificadoAdministrador, borrarProducto);
 
 // Manejo de rutas en caso de que no sean encontradas
 routerProductos.use((req, res) => res.status(404).end());

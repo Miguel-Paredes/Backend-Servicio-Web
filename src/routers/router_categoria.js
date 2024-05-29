@@ -18,19 +18,19 @@ const routerCategoria = express.Router();
 routerCategoria.use(express.json());
 
 // Ruta para mostrar todas las categorias
-routerCategoria.get('/listar', mostrarCategorias);
+routerCategoria.get('/categoria/listar', mostrarCategorias);
 
 // Ruta para buscar una categoria
-routerCategoria.get('/buscar/:id', buscarCategoria);
+routerCategoria.get('/categoria/buscar/:id', buscarCategoria);
 
 // Ruta para ver agregar una categoria
-routerCategoria.post('/registro', verificadoAdministrador, registrarCategoria);
+routerCategoria.post('/categoria/registro', verificadoAdministrador, registrarCategoria);
 
 // Ruta para ver actualizar una categoria
-routerCategoria.put('/actualizar/:id', verificadoAdministrador, actualizarCategoria);
+routerCategoria.put('/categoria/actualizar/:id', verificadoAdministrador, actualizarCategoria);
 
 // Ruta para ver borrar una categoria
-routerCategoria.delete('/borrar/:id', verificadoAdministrador, borrarCategoria);
+routerCategoria.delete('/categoria/borrar/:id', verificadoAdministrador, borrarCategoria);
 
 // Manejo de rutas en caso de que no sean encontradas
 routerCategoria.use((req, res) => res.status(404).end());
