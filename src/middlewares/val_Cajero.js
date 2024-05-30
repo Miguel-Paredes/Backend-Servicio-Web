@@ -1,27 +1,20 @@
 // Importa las funciones check y validationResult desde el módulo express-validator
 const { check, validationResult } = require('express-validator');
 
-const validacion = [
+const validacionCajero = [
   // Validación para los campos 'username', 'email' y 'password'
-  check(["nombre", "apellido", "email", "password"])
+  check(["username", "email", "password"])
     .exists()
     .withMessage('Los campos "nombre", "apellido", "email" y/o "password" son obligatorios')
     .notEmpty()
     .withMessage('Los campos "nombre", "apellido", "email" y/o "password" no pueden estar vacíos')
     .customSanitizer(value => value?.trim()),
   // Validación para el campo 'username'
-  check("nombre")
+  check("username")
     .isLength({ min: 3, max: 20 })
     .withMessage('El campo "nombre" debe tener entre 3 y 20 caracteres')
     .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
     .withMessage('El campo "username" debe contener solo letras y espacios')
-    .customSanitizer(value => value?.trim()),
-  // Validación para el campo 'apellido'
-  check("apellido")
-    .isLength({ min: 3, max: 20 })
-    .withMessage('El campo "apellido" debe tener entre 3 y 20 caracteres')
-    .matches(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/)
-    .withMessage('El campo "apellido" debe contener solo letras y espacios')
     .customSanitizer(value => value?.trim()),
   // Validación para el campo 'email'
   check("email")
@@ -60,4 +53,4 @@ const validacion = [
 ];
 
 // Exportamos la validacion
-module.exports = validacion;
+module.exports = validacionCajero;

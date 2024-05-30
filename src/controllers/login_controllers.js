@@ -71,7 +71,6 @@ const registroLogin = async (req, res) => {
     await user.save();
     // Enviamos un mensaje que verifique su correo, si todo esta en orden
     res.status(200).json({ message: 'Revisa tu correo electrónico para confirmar tu cuenta' });
-    console.log(user)
   } catch (err) {
     // Enviamos un mensaje de error en caso de que no se pueda registrar el usuario
     res.status(500).json({ error: 'Error al registrar el usuario' });
@@ -81,7 +80,6 @@ const registroLogin = async (req, res) => {
 };
 
 const confirmEmail = async (req, res) => {
-  const token = req.params.token
   // Verifica si no se proporcionó un token en los parámetros de la solicitud
   if (!(req.params.token)) return res.status(400).json({ msg: 'Lo sentimos, no se puede validar la cuenta' });
   // Busca en la base de datos un registro con el token proporcionado

@@ -16,7 +16,7 @@ const {
 // Importamos la autentificacion
 const verificadoAutentication = require('../helpers/autenticacion');
 // Importamos la autentificacion del administrador
-const verificadoAdministrador = require('../helpers/permiso_admin');
+const verificadoEmpleados = require('../helpers/permiso_empleados');
 
 // Importamos Router para crear el router de pedidos
 const routerPedidos = express.Router();
@@ -28,10 +28,10 @@ routerPedidos.use(express.json());
 routerPedidos.get('/pedidos/:id', verificadoAutentication, verPedido)
 
 // Ruta para que el administrador pueda ver todo los pedidos
-routerPedidos.get('/pedidos/admin/mostrar', verificadoAdministrador, mostrarPedidosAdministrador)
+routerPedidos.get('/pedidos/admin/mostrar', verificadoEmpleados, mostrarPedidosAdministrador)
 
 // Ruta para que el administrador pueda buscar un pedido
-routerPedidos.get('/pedidos/admin/mostrar/:id', verificadoAdministrador, buscarPedidoAdministrador)
+routerPedidos.get('/pedidos/admin/mostrar/:id', verificadoEmpleados, buscarPedidoAdministrador)
 
 // Ruta para ver todos los pedidos realizados
 routerPedidos.post('/pedidos/mostrar', verificadoAutentication, mostrarPedidos);

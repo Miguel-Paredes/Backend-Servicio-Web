@@ -125,14 +125,16 @@ const actualizarProducto = async (req, res) => {
     const ProductoId = req.params.id
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades nombre, precio, descripcion y categoria en variables separadas 
-    const { nombre, precio, descripcion, categoria, imagen, cantidad } = req.body
+    const { nombre, precio, descripcion, imagen, cantidad } = req.body
+    let categoria = req.body.categoria
+    categoria = categoria.toUpperCase()
     // Validar todos los campos llenos
     if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
     try{
         // Buscamos el producto por el id
         let ProductoActualizado = await Producto.findById( ProductoId )
         // Buscamos si la categoria del Producto existe
-        const exisCategoria = await Categoria.findOne({ categoria })
+        const exisCategoria = await Categoria.findOne({ categoria : categoria })
         if(!ProductoActualizado) return res.status(404).json({ message : 'No se encontro el Producto para actualizar'})
         // Colocamos condicionales para evitar que se ingresen numeros negativos
         // En caso de que el precio menor a 0 enviamos un mensaje
@@ -148,7 +150,7 @@ const actualizarProducto = async (req, res) => {
                 precio,
                 descripcion,
                 categoria,
-                categoria
+                cantidad
             },
             { new : true}
         )

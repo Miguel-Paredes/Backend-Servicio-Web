@@ -13,8 +13,8 @@ const Registro = require ('../models/login.js')
 // Importamos el modelo Carrito
 const Carrito = require ('../models/carrito.js');
 
-// Importamos sendMailToConfirmBuyOfUser, sendMailToAdmin
-const { sendMailToConfirmBuyOfUser, sendMailToAdmin } = require('../config/nodemailer.js');
+// Importamos sendMailToConfirmBuyOfUser, sendMailToAdmin, sendMailToAdminToUpdateProduct
+const { sendMailToConfirmBuyOfUser, sendMailToAdmin, sendMailToAdminToUpdateProduct } = require('../config/nodemailer.js');
 
 
 const agregarProductoPedido = async (req, res) => {
@@ -44,7 +44,7 @@ const agregarProductoPedido = async (req, res) => {
         // En caso de que se encuentre ese producto en el pedido enviamos un mensaje
         if(busProductoPedido) return res.json({ message : 'Ese producto ya esta en el pedido' })
         // Verificamos en stock que cantidad de producto tenemos
-        if(cantidad <= busProducto.cantidad) return res.json({ message : `Solo tenemos en stock ${busProducto.cantidad}`})
+        if(cantidad > busProducto.cantidad) return res.json({ message : `Solo tenemos en stock ${busProducto.cantidad}`})
         // En caso de que no se hallan realizado pedidos agregamos el primer producto a un cliente
         const nuevoProductoPedido = new Carrito({
             _id : new mongoose.Types.ObjectId,
@@ -61,6 +61,14 @@ const agregarProductoPedido = async (req, res) => {
             'Precio' : busProducto.precio,
             'Cantidad' : cantidad
         }
+        // Restamos la cantidad del producto que el cliente va a adquirir
+        const nuevaCantidad = busProducto.cantidad - cantidad
+        // Actualizamos la cantidad en stock
+        await Producto.findByIdAndUpdate( producto, { cantidad : nuevaCantidad }, { new : true} )
+        if(nuevaCantidad == 0){
+            sendMailToAdminToUpdateProduct(busProducto.nombre)
+        }
+        // Mostramos el producto agregado
         res.json({ message : 'Producto agregado', Producto : productoAgregado})
     }catch(err){
         // Enviamos un mensaje en caso de que no se pudo agregar el producto al pedido
@@ -91,6 +99,7 @@ const actualizarProductoPedido = async (req, res) => {
         const veriProducto = busProducto.nombre
         // Buscamos el producto del pedido en la base de datos
         const busProductoPedido = await Carrito.findOne({producto : veriProducto, cliente : cliente})
+        cantidad -= busProductoVenta.cantidad
         // En caso de que no se encuentre ese producto enviamos un mensaje
         if(!busProducto || busProducto.length === 0) return res.json({ message : 'No existe ese producto' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
@@ -98,7 +107,8 @@ const actualizarProductoPedido = async (req, res) => {
         // En caso de que no se encuentre ese producto en el pedido enviamos un mensaje
         if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'No existe ese producto en el pedido' })
         // Verificamos en stock que cantidad de producto tenemos
-        if(cantidad <= busProducto.cantidad) return res.json({ message : `Solo tenemos en stock ${busProducto.cantidad}`})
+        if(cantidad > busProducto.cantidad) return res.json({ message : `Solo tenemos en stock ${busProducto.cantidad+cantidad}`})
+        cantidad += busProductoVenta.cantidad
         // Actualizamos el producto
         const productoPedidoActualizado = await Carrito.findByIdAndUpdate(
             busProductoPedido._id,
@@ -133,18 +143,26 @@ const borrarProductoPedido = async (req, res) => {
     try{
         // Buscamos el producto en la base de datos
         const busProducto = await Producto.findById( producto )
+        // Almacenamos el stock en una variable
+        let stock = busProducto.cantidad
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
         // Almacenamos el nombre del producto
         const veriProducto = busProducto.nombre
         // Buscamos el producto del pedido en la base de datos
         const busProductoPedido = await Carrito.findOne({producto : veriProducto, cliente : cliente})
+        // Almacenamos la cantidad del producto en una valriable
+        const cantidad = busProductoPedido.cantidad
         // En caso de que no se encuentre ese producto enviamos un mensaje
         if(!busProducto || busProducto.length === 0) return res.json({ message : 'No existe ese producto' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
         // En caso de que no se encuentre ese producto en el pedido enviamos un mensaje
         if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'No existe ese producto en el pedido' })
+        // Sumamos al stock la cantidad del producto del carrito
+        stock += cantidad
+        // Actualizamos el stock de la tienda
+        await Producto.findByIdAndUpdate( producto, { cantidad : stock }, { new : true } )
         // Buscamos el producto y lo eliminamos
         await Carrito.findByIdAndDelete(busProductoPedido._id)
         // Enviamos un mensaje indicando que se borro el producto
@@ -173,6 +191,13 @@ const eliminarPedido = async (req, res) => {
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'Ese cliente no se encuentra haciendo un pedido' })
         for(i = 0 ; i < busProductoPedido.length ; i++){
+            const nombre = busProductoVenta[i].producto
+            const product = await Producto.findOne({ nombre : nombre})
+            const id = product.id
+            let stock = product.cantidad
+            const cantidad = busProductoVenta[i].cantidad
+            stock += cantidad
+            await Producto.findByIdAndUpdate(id, { cantidad : stock }, { new : true})
             await Carrito.findByIdAndDelete(busProductoPedido[i]._id)
         }
         res.json({ message : 'Pedido eliminado' })
@@ -443,7 +468,7 @@ const buscarPedidoAdministrador = async (req, res) => {
     const fin = new Date(fecha)
     try {
         // Buscamos los pedidos en la bdd
-        const cliente = await Registro.findOne({ telefono })
+        const cliente = await Registro.findOne({ telefono : telefono })
         // En caso de que no existan pedidos enviamos un mensaje
         if(!cliente || cliente.length === 0) return res.json({ message : 'No ese cliente'})
         const Pedidos = await Pedido.find({

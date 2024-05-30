@@ -12,7 +12,7 @@ const {
 } = require('../controllers/cajero_controllers.js');
 
 // Importamos la validacion de campos
-const validacion = require('../middlewares/validacion.js');
+const validacionCajero = require('../middlewares/val_Cajero.js');
 
 // Importamos Router para crear el router de ingreso
 const routerCajero = express.Router()
@@ -21,10 +21,10 @@ const routerCajero = express.Router()
 routerCajero.use(express.json())
 
 // Ruta para registrar un cajero
-routerCajero.post('/cajeros/registro', validacion, verificadoAdministrador, crearCajero )
+routerCajero.post('/cajeros/registro', validacionCajero, verificadoAdministrador, crearCajero )
 
 // Ruta para actualizar un cajero
-routerCajero.put('/cajeros/actualizar', validacion, verificadoAdministrador, actualizarCajero)
+routerCajero.put('/cajeros/actualizar', validacionCajero, verificadoAdministrador, actualizarCajero)
 
 // Ruta para borrar un cajero
 routerCajero.delete('/cajeros/eliminar', verificadoAdministrador, borrarCajero)

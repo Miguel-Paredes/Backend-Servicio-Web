@@ -162,9 +162,47 @@ const sendMailToAdmin = async(id, telefono)=>{
     console.log('Correo enviado al administrador: ' + compra.response);
 }
 
+const sendMailToAdminToUpdateProduct = async(producto)=>{
+    let compra = await transporter.sendMail({
+    // Remitente del correo
+    from: process.env.USER_MAILTRAP,
+     // Destinatario del correo
+    to: process.env.EMAIL_ADMINISTRADOR,
+     // Asunto del correo
+    subject: "Actualizar Stock",
+    html: `
+    <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; display: flex; justify-content: center; align-items: center; margin-top: 20px; width: 100%;">
+
+        <div style="max-width: 90%; padding: 2rem; text-align: center; border: 1px solid #dddddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+
+            <div style="background-color: #00e8bc; /* Fondo verde */ padding: 1rem; border-radius: 10px; /* Bordes redondeados */">
+                <h1 style="color: #ffffff; margin-bottom: 2rem;">Producto no disponible</h1>
+            </div>
+            
+            <div style="text-align: left; margin-bottom: 1rem;">
+                <p style="color: #333333; margin-bottom: 2rem; text-align: justify;">
+                    Estimado Administrador, <br>
+                    Se ha enviado este correo con este mensaje para informarte que el siguiente producto ya no está disponible en nuestra tienda en línea: ${producto} <br>
+                    Por favor, actualiza la cantidad de productos disponibles en la página
+                </p>
+            </div>
+
+            <a href=${process.env.URL} style="background-color: #006256; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Confirmar cuenta</a>
+
+            <footer style="background-color: #ffffff; padding: 1rem; text-align: center;">
+                <p style="color: #666666; margin: 0;">Mika y Vale © 2024. Todos los derechos reservados.</p>
+            </footer>
+        </div>
+    </body>`
+    });
+    // Muestra un mensaje de confirmación si el correo se envió correctamente
+    console.log('Correo enviado al administrador: ' + compra.response);
+}
+
 module.exports = {
     sendMailToUser,
     sendMailToRecoveryPassword,
     sendMailToConfirmBuyOfUser,
-    sendMailToAdmin
+    sendMailToAdmin,
+    sendMailToAdminToUpdateProduct
 }

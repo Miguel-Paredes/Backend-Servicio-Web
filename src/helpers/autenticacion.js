@@ -1,17 +1,13 @@
 // Importamos el modelo Registro
 const Registro = require('../models/login.js');
-// Importamos el modelo de Cajero
-const Cajero = require("../models/cajero");
 
 // Metodo para proteger las rutas
 const verificadoAutentication = async (req, res, next) => {
   const cliente = req.body.cliente
   // Buscamos en el la bdd si el cliente inicio sesion o no
-  const sesion = await Registro.findOne({cliente})
-  // Buscamos en el la bdd si el cajero inicio sesion o no
-  const Cajeros = await Cajero.findOne({cliente})
+  const sesion = await Registro.findOne({ _id : cliente })
   // Si existe un inicio de sesion
-  if((sesion.inicioSesion == true && sesion.admin == false) || (Cajero.inicioSesion == true)){
+  if(sesion.inicioSesion == true && sesion.admin == false){
     // Continuar
     return next();
   }else{

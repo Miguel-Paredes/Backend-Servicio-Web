@@ -13,12 +13,14 @@
     const routerFavoritos = require('./routers/router_favoritos.js')
     // Importamos routerLogin para manejar las solicitudes a la ruta /api/login
     const routerLogin = require('./routers/router_login.js')
-    // Importamos routerLogin para manejar las solicitudes a la ruta /api/categoria
+    // Importamos routerCategoria para manejar las solicitudes a la ruta /api/categoria
     const routerCategoria = require('./routers/router_categoria.js')
-    // Importamos routerLogin para manejar las solicitudes a la ruta /api/pedidos
+    // Importamos routerPedidos para manejar las solicitudes a la ruta /api/pedidos
     const routerPedidos = require('./routers/router_pedidos.js')
-    // Importamos routerLogin para manejar las solicitudes a la ruta /api/cajeros
+    // Importamos routerCajero para manejar las solicitudes a la ruta /api/cajeros
     const routerCajero = require('./routers/router_cajero.js')
+    // Importamos routerVentas para manejar las solicitudes a la ruta /api/ventas
+    const routerVentas = require('./routers/router_ventas.js')
 
 // Inicializaciones
     // Creamos una variable que nos permita usar express
@@ -49,12 +51,14 @@
     app.use('/api', routerFavoritos)
     // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/login
     app.use('/api', routerLogin)
-    // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/categoria
+    // Utilizamos routerCategoria para manejar las solicitudes a la ruta /api/categoria
     app.use('/api', routerCategoria)
-    // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/pedidos
+    // Utilizamos routerPedidos para manejar las solicitudes a la ruta /api/pedidos
     app.use('/api', routerPedidos)
-    // Utilizamos routerLogin para manejar las solicitudes a la ruta /api/cajeros
+    // Utilizamos routerCajero para manejar las solicitudes a la ruta /api/cajeros
     app.use('/api', routerCajero)
+    // Utilizamos routerVentas para manejar las solicitudes a la ruta /api/ventas
+    app.use('/api', routerVentas)
 
     // Manejo de rutas en caso de que no sean encontradas
     app.use((req, res) => res.status(404).end())
