@@ -9,10 +9,14 @@ const {
     mostrarVentas,
     buscarVenta,
     CajeroVenta,
-    verVenta,
     mostrarVentasAdministrador,
-    buscarVentaAdministrador
-} = require('../controllers/ventas_controllers');
+    buscarVentaAdministrador,
+    verPedidosClientes,
+    verPedidosEstadoClientes,
+    PrepararPedidoCliente,
+    EnviarPedidoCliente,
+    PagadoPedidoCliente
+} = require('../controllers/ventas_controllers.js');
 // Importamos la autentificacion de los empleados
 const verificadoEmpleados = require('../helpers/permiso_empleados');
 
@@ -21,9 +25,6 @@ const routerVentas = express.Router();
 
 // Hacemos que el router use archivos json
 routerVentas.use(express.json());
-
-// Ruta para ver todos las ventas realizados
-routerVentas.get('/ventas/:id', verificadoEmpleados, verVenta)
 
 // Ruta para que el administrador pueda ver todo las ventas
 routerVentas.get('/ventas/admin/mostrar', verificadoEmpleados, mostrarVentasAdministrador)
@@ -54,6 +55,21 @@ routerVentas.post('/ventas/actualizar/:id', verificadoEmpleados, actualizarProdu
 
 // Ruta para eliminar todo el pedido
 routerVentas.post('/ventas/eliminar', verificadoEmpleados, eliminarVenta);
+
+// Ruta para ver los pedidos de los clientes
+routerVentas.post('/ventas/cliente', verificadoEmpleados, verPedidosClientes)
+
+// Ruta para ver pedidos de los clientes segun su estado
+routerVentas.post('/ventas/cliente/estado/:estado', verificadoEmpleados, verPedidosEstadoClientes)
+
+// Ruta para ver el pedidos de cliente
+routerVentas.post('/ventas/cliente/:pedido', verificadoEmpleados, PrepararPedidoCliente)
+
+// Ruta para cambiar el estado del pedido
+routerVentas.post('/ventas/cliente/enviado/:pedido', verificadoEmpleados, EnviarPedidoCliente)
+
+// Ruta para ver el pedidos de cliente
+routerVentas.post('/ventas/cliente/pagado/:pedido', verificadoEmpleados, PagadoPedidoCliente)
 
 // Exportamos routerVentas
 module.exports = routerVentas

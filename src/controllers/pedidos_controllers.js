@@ -353,6 +353,12 @@ const registroPedido = async (req, res) => {
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
         // En caso de que no se encuentre ese producto en el pedido enviamos un mensaje
         if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'Ese cliente no se encuentra haciendo un pedido' })
+        const busPedido = await Pedido.find({cliente})
+        if(busPedido.length > 0 ) {
+            if(busPedido[busPedido.length - 1] != 'Pagado'){
+                res.json({ message : `Antes de realizar otro pedido pague el anterior, el valor a pagar es de ${busPedido[busPedido.length - 1].total}`})
+            }
+        }
         // Creamos una nueva instancia 
         const nuevoPedido = new Pedido({
             _id : new mongoose.Types.ObjectId,
@@ -399,15 +405,15 @@ const registroPedido = async (req, res) => {
         nuevoPedido.total = total;
         // Guardamos en la base de datos
         await nuevoPedido.save()
-        const email = busCliente.email
-        const pedido = String(nuevoPedido._id)
-        const telefono = busCliente.telefono
-        // Enviamos un correo al cliente respecto a su pedido
-        await sendMailToConfirmBuyOfUser(email, pedido)
-        // Enviamos un correo al administrador con el pedido del cliente luego de 5 segundos de haber enviado el correo al cliente
-        setTimeout(async () => {
-            await sendMailToAdmin(pedido, telefono);
-          }, 5000);
+// const email = busCliente.email
+// const pedido = String(nuevoPedido._id)
+// const telefono = busCliente.telefono
+// // Enviamos un correo al cliente respecto a su pedido
+// await sendMailToConfirmBuyOfUser(email, pedido)
+// // Enviamos un correo al administrador con el pedido del cliente luego de 5 segundos de haber enviado el correo al cliente
+// setTimeout(async () => {
+//     await sendMailToAdmin(pedido, telefono);
+//   }, 5000);
         // Enviamos un mensaje
         res.json({ message : 'Pedido realizado con exito', Pedido : mostrar })
     }catch(err){

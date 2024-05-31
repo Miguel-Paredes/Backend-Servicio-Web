@@ -24,8 +24,8 @@ const routerPedidos = express.Router();
 // Hacemos que el router use archivos json
 routerPedidos.use(express.json());
 
-// Ruta para ver todos los pedidos realizados
-routerPedidos.get('/pedidos/:id', verificadoAutentication, verPedido)
+// Ruta para ver el pedido realizados
+routerPedidos.get('/pedidos/:id', verPedido)
 
 // Ruta para que el administrador pueda ver todo los pedidos
 routerPedidos.get('/pedidos/admin/mostrar', verificadoEmpleados, mostrarPedidosAdministrador)

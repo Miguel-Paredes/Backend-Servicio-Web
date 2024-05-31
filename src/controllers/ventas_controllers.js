@@ -13,6 +13,9 @@ const Cajero = require ('../models/cajero.js')
 // Importamos el modelo CarritoCajero
 const CarritoCajero = require ('../models/carrito_cajeros.js');
 
+// Importamos el modelo CarritoCajero
+const Pedido = require ('../models/pedidos.js');
+
 // Importamos sendMailToAdminToUpdateProduct
 const { sendMailToAdminToUpdateProduct } = require('../config/nodemailer.js');
 
@@ -400,31 +403,6 @@ const CajeroVenta = async (req, res) => {
     }
 }
 
-const verVenta = async(req, res) => {
-    // Extraemos el id de la url
-    const VentaId = req.params.id
-    try{
-        const Ventas = await Venta.find({ _id : VentaId})
-        // En caso de que no exista ese Favorito enviamos un mensaje
-        if (!Ventas || Ventas.length === 0) return res.json({ message : 'No existe esa Venta del Cajero' });
-        // Convertimos la primera letra en mayuscula y el resto en minuscula de los nombres de los productos
-        const listarVentas = Ventas.map(Venta => {
-            const productosFormateados = Venta.producto.map(producto => {
-                const nombreProducto = producto.charAt(0).toUpperCase() + producto.slice(1).toLowerCase();
-                return nombreProducto;
-            });
-            return { ...Venta.toObject(), producto: productosFormateados };
-        });
-        // Mostramos todos los Ventas del cliente
-        res.status(200).json(listarVentas);
-    }catch(err){
-        // Enviamos un mensaje en caso de que no se pudo buscar el Venta
-        res.status(500).json({ message : 'Error mostrar la Venta del Cajero' })
-        // Mostramos el mensaje en consola
-        console.log(err)
-    }
-}
-
 const mostrarVentasAdministrador = async (req, res) => {
     try {
         // Buscamos los Ventas en la bdd
@@ -470,6 +448,109 @@ const buscarVentaAdministrador = async (req, res) => {
     }
 }
 
+const verPedidosClientes = async (req, res) => {
+    try{
+        // Visualizar todos los pedidos
+        const visualizar = await Pedido.find()
+        // Si no existen pedidos enviamos un mensaje
+        if(visualizar.length === 0 || !visualizar) return res.json({ message : 'No existen pedidos' })
+        // Mostramos todos los pedidos
+        res.json(visualizar)
+    }catch(err){
+        // Enviamos un mensaje en caso de que no se pudo mostrar todos los Ventas
+        res.json({ message : 'Error al mostrar todos los Pedidos'})
+        // Mostramos los errores
+        console.log(err)
+    }
+}
+
+const verPedidosEstadoClientes = async (req, res) => {
+    // Extraemos el estado de la url
+    const estado = req.params.estado
+    try{
+        // Visualizar todos los pedidos
+        const visualizar = await Pedido.find({ estado : estado})
+        // Si no existen pedidos enviamos un mensaje
+        if(visualizar.length === 0 || !visualizar) return res.json({ message : 'No existen pedidos en ese estado' })
+        // Mostramos todos los pedidos
+        res.json(visualizar)
+    }catch(err){
+        // Enviamos un mensaje en caso de que no se pudo mostrar todos los Ventas
+        res.json({ message : 'Error al mostrar los Pedidos segun el estado'})
+        // Mostramos los errores
+        console.log(err)
+    }
+}
+
+const PrepararPedidoCliente = async (req, res) => {
+    // Extraemos el pedido de la url
+    const pedido = req.params.pedido
+    try {
+        // Visualizar todos los pedidos
+        let visualizar = await Pedido.find({ id : pedido})
+        // Si no existen pedidos enviamos un mensaje
+        if(visualizar.length === 0 || !visualizar) return res.json({ message : 'No existe ese pedido' })
+        // Si el estado del pedido es en espera se actualiza a en preparacion
+        if(visualizar[0].estado == 'En espera'){
+            // Actualizamos el estado del pedido
+            visualizar = await Pedido.findByIdAndUpdate(pedido, { estado : 'En preparación'}, { new : true })
+        }
+        // Mostramos todos los pedidos
+        res.json(visualizar)
+    }catch(err){
+        // Enviamos un mensaje en caso de que no se pudo mostrar todos los Ventas
+        res.json({ message : 'Error al mostrar los Pedidos segun el estado'})
+        // Mostramos los errores
+        console.log(err)
+    }
+}
+
+const EnviarPedidoCliente = async (req, res) => {
+    // Extraemos el pedido de la url
+    const pedido = req.params.pedido
+    try {
+        // Visualizar todos los pedidos
+        let visualizar = await Pedido.find({ id : pedido})
+        // Si no existen pedidos enviamos un mensaje
+        if(visualizar.length === 0 || !visualizar) return res.json({ message : 'No existe ese pedido' })
+        // Si el estado del pedido es en preparacion se actualiza a enviado
+        if(visualizar[0].estado == 'En preparación'){
+            // Actualizamos el estado del pedido
+            visualizar = await Pedido.findByIdAndUpdate(pedido, { estado : 'Enviado'}, { new : true })
+        }
+        // Mostramos todos los pedidos
+        res.json(visualizar)
+    }catch(err){
+        // Enviamos un mensaje en caso de que no se pudo mostrar todos los Ventas
+        res.json({ message : 'Error al mostrar los Pedidos segun el estado'})
+        // Mostramos los errores
+        console.log(err)
+    }
+}   
+
+const PagadoPedidoCliente = async (req, res) => {
+    // Extraemos el pedido de la url
+    const pedido = req.params.pedido
+    try {
+        // Visualizar todos los pedidos
+        let visualizar = await Pedido.find({ id : pedido})
+        // Si no existen pedidos enviamos un mensaje
+        if(visualizar.length === 0 || !visualizar) return res.json({ message : 'No existe ese pedido' })
+        // Si el estado del pedido es ennviado se actualiza a pagado
+        if(visualizar[0].estado == 'Enviado'){
+            // Actualizamos el estado del pedido
+            visualizar = await Pedido.findByIdAndUpdate(pedido, { estado : 'Pagado'}, { new : true })
+        }
+        // Mostramos todos los pedidos
+        res.json(visualizar)
+    }catch(err){
+        // Enviamos un mensaje en caso de que no se pudo mostrar todos los Ventas
+        res.json({ message : 'Error al mostrar los Pedidos segun el estado'})
+        // Mostramos los errores
+        console.log(err)
+    }
+}  
+
 module.exports = {
     agregarProductoVenta,
     actualizarProductoVenta,
@@ -479,7 +560,11 @@ module.exports = {
     mostrarVentas,
     buscarVenta,
     CajeroVenta,
-    verVenta,
     mostrarVentasAdministrador,
-    buscarVentaAdministrador
+    buscarVentaAdministrador,
+    verPedidosClientes,
+    verPedidosEstadoClientes,
+    PrepararPedidoCliente,
+    EnviarPedidoCliente,
+    PagadoPedidoCliente
 }
