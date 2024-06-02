@@ -55,7 +55,8 @@ const buscarCategoria = async (req, res) => {
 const registrarCategoria = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos la propiedad categoria en una variable
-    const categoria = req.body.categoria
+    let categoria = req.body.categoria
+    categoria = categoria.toUpperCase()
     // Validar todos los campos llenos
     if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
     try {
@@ -121,11 +122,25 @@ const borrarCategoria = async (req, res) => {
     // Obtenemos el valor de id de la URL
     const CategoriaId = req.params.id;
     try {
-        // Buscamos en la base de datos la categoria del Producto y la eliminamos
-        let categoriaEliminado = await Categoria.findByIdAndDelete(CategoriaId);
+        // Buscamos en la base de datos la categoria del Producto
+        const categoriaEliminado = await Categoria.findById(CategoriaId);
         if (!categoriaEliminado) return res.status(404).json({ message: 'No se encontró la Categoria para borrar' });
-        // Enviamos un mensaje indicando que se borró el Producto
-        res.status(200).json({ message: 'Categoria borrada' });
+        const nombreCategoria = categoriaEliminado.categoria
+        // Importamos el modelo Producto
+        const Producto = require('../models/productos.js');
+        // Buscamos productos con esa categoria
+        const categoriaProducto = await Producto.find({ categoria : nombreCategoria })
+        // Si no existen productos con esa categoria se elimina
+        if(categoriaProducto.length === 0 || !categoriaProducto) {
+            // Eliminamos la categoria
+            await Categoria.findByIdAndDelete(CategoriaId);
+            // Enviamos un mensaje indicando que se borró el Producto
+            res.status(200).json({ message: 'Categoria borrada' });
+        }
+        // Si existen productos con esa categoria no se elimina
+        else{
+            res.json({ message : 'No se puede eliminar porque hay productos con esa categoria'})
+        }
     } catch (err) {
         // Enviamos un mensaje de error en caso de que no se pueda borrar el Producto
         res.status(500).json({ message: 'Error al borrar la Categoria' });

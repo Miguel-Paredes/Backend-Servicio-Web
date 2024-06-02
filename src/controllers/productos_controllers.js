@@ -63,16 +63,17 @@ const buscarProducto = async (req, res) => {
 const registrarProducto = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades nombre, precio, descripcion y categoria en variables separadas 
-    const { nombre, precio, descripcion, cantidad } = req.body
-    let { categoria } = req.body
+    const { precio, descripcion, cantidad } = req.body
+    let { nombre, categoria } = req.body
     categoria = categoria.toUpperCase()
+    nombre = nombre.toUpperCase()
     // Validar todos los campos llenos
     if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
     try {
         // Buscamos si el nombre del Producto ya se encuentra registrado
-        const exisNombre = await Producto.findOne({ nombre })
+        const exisNombre = await Producto.findOne({ nombre : nombre })
         // Buscamos si la categoria del Producto existe
-        const exisCategoria = await Categoria.findOne({ categoria })
+        const exisCategoria = await Categoria.findOne({ categoria : categoria })
         // En caso de ya estar registrado enviamos un mensaje
         if(exisNombre) return res.json({ message : 'Ya existe un Producto con ese nombre'})
         // Colocamos condicionales para evitar que se ingresen numeros negativos
