@@ -213,7 +213,7 @@ const categoriaProducto = async (req, res) => {
     categoria = categoria.toUpperCase()
     try{
         // Buscamos en la base de datos ese Producto
-        const productoCategoria = await Producto.find({ categoria })
+        const productoCategoria = await Producto.find({ categoria : categoria })
         // En caso de que no exista esa categoria de Producto enviamos un mensaje
         if(!productoCategoria) return res.json({ message : 'No existe esa categoria de producto' })
         // Modificamos el nombre de cada Producto para tener la primera inicial en mayúscula
@@ -237,7 +237,7 @@ const categoriaProducto = async (req, res) => {
 const actualizarCategoriaProducto = async (CategoriaId, categoria) => {
     try{
         // Buscamos todos los productos con esa categoria
-        const producto = await Producto.find({ CategoriaId })
+        const producto = await Producto.find({ _id : CategoriaId })
         // En caso de que no existan productos con esa categoria
         if(producto.length === 0 || !producto) return console.log('No existen productos con esa categoria')
         // En caso de que si existan

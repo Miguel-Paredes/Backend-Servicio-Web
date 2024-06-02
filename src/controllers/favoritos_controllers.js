@@ -6,8 +6,6 @@ const Producto = require ('../models/productos.js')
 const Registro = require ('../models/login.js')
 // Importamos moongose
 const mongoose = require ('mongoose')
-// Importamos el modelo Categoria
-const Categoria = require('../models/categoria.js');
 
 const mostrarFavoritos = async (req, res) => {
     try {
@@ -64,12 +62,18 @@ const registrarFavorito = async (req, res) => {
         const producto = await Producto.findById(req.body.producto);
         // Buscamos el cliente
         const cliente = await Registro.findById(req.body.cliente);
+        // Almacenamos el id de producto
+        const idProducto = producto.id
+        // Buscamos el producto en la lista de favoritos
+        const favoritos = await Favorito.find({ cliente : cliente, producto : idProducto })
         // Verificamos si el producto y el cliente existen
         if(!cliente && !producto) return res.json({ message: 'El producto y el cliente no existen' });
         // Verificamos si el producto existe
         else if (!producto) return res.json({ message: 'El producto no existe' });
         // Verificamos si el cliente existe
         else if (!cliente) return res.json({ message: 'El cliente no existe' });
+        // En caso de que el producto ya se encuentre en favoritos enviamos un mensaje
+        if(favoritos) return res.json({ message : 'Ese producto ya se encuentra en favoritos'})
         // Creamos una nueva instancia de Favorito
         const nuevoFavorito = new Favorito({
             _id: new mongoose.Types.ObjectId(),
@@ -108,7 +112,7 @@ const actualizarFavorito = async (productoId) => {
         const categoria = producto.categoria
         const imagen = producto.imagen
         // Buscamos el favorito correspondiente al producto
-        const buscarFavorito = await Favorito.find({producto})
+        const buscarFavorito = await Favorito.find({ producto : producto})
         // Usamos un bucle para que busque en todos los favoritos el producto y los actualice
         for(let i = 0 ; i < buscarFavorito.length ; i++){
             // Usamos la funcion String para poder comparar mas facilmente
@@ -142,9 +146,11 @@ const actualizarFavorito = async (productoId) => {
 const borrarFavorito = async (req, res) => {
     // Obtenemos el valor de id de la URL
     const FavoritoId = req.params.id;
+    // Obtenemos el valor de cliente del body
+    const idcliente = req.body.cliente
     try {
         // Buscamos en la base de datos los Favoritos de un cliente en especifico
-        const cliente = await Favorito.find(req.body.cliente);
+        const cliente = await Favorito.find({ _id : idcliente});
         if(!cliente) return res.json({ message : 'No existe ese cliente' })
         // Buscamos en la base de datos ese Favorito y lo eliminamos
         const FavoritoEliminado = await Favorito.findByIdAndDelete(FavoritoId);
@@ -165,7 +171,7 @@ const eliminarFavorito = async (productoId) => {
         // Almacenamos la informacion de productoId en una variable
         const busc = productoId
         // Buscamos el favorito correspondiente al producto
-        const buscarFavorito = await Favorito.find({productoId})
+        const buscarFavorito = await Favorito.find({ _id : productoId})
         // Usamos un bucle para que busque en todos los favoritos el producto y los elimine
         for(let i = 0 ; i < buscarFavorito.length ; i++){
             // Usamos la funcion String para poder comparar mas facilmente
@@ -187,7 +193,7 @@ const eliminarFavorito = async (productoId) => {
 const actualizarCategoriaFavorito = async (CategoriaId, categoria) => {
     try{
         // Buscamos todos los productos con esa categoria
-        const favorito = await Favorito.find({ CategoriaId })
+        const favorito = await Favorito.find({ _id : CategoriaId })
         // En caso de que no existan productos con esa categoria
         if(favorito.length === 0 || !favorito) return console.log('No existen productos favoritos con esa categoria')
         else{
@@ -214,12 +220,12 @@ const categoriaFavorito = async (req, res) => {
     // Obtenemos el valor de la url
     let categoriaID = req.params.categoria
     // Colocamos el nombre en mayuscula
-    categoriaID += categoriaID.toUpperCase()
+    categoriaID = categoriaID.toUpperCase()
     // Obtenemos el id del cliente del body
     const cliente = req.body.cliente
     try{
         // Buscamos en la base de datos ese Favorito
-        const Favoritos = await Favorito.find({ categoriaID, cliente })
+        const Favoritos = await Favorito.find({ categoria : categoriaID, cliente : cliente })
         // En caso de que no exista ese Favorito enviamos un mensaje
         if (!Favoritos || Favoritos.length === 0) return res.json({ message: 'No existe ese Favorito' });
         // Modificamos el nombre del Favorito para tener la primera inicial en mayúscula y las demás en minúscula

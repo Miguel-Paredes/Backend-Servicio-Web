@@ -353,7 +353,7 @@ const registroPedido = async (req, res) => {
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
         // En caso de que no se encuentre ese producto en el pedido enviamos un mensaje
         if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'Ese cliente no se encuentra haciendo un pedido' })
-        const busPedido = await Pedido.find({cliente})
+        const busPedido = await Pedido.find({ cliente : cliente })
         if(busPedido.length > 0 ) {
             if(busPedido[busPedido.length - 1] != 'Pagado'){
                 res.json({ message : `Antes de realizar otro pedido pague el anterior, el valor a pagar es de ${busPedido[busPedido.length - 1].total}`})

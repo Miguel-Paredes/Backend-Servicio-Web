@@ -163,7 +163,7 @@ const administrador = async (req, res) => {
   const admin = true;
   try {
     // Buscamos si ya hay el usuario del administrador
-    const buscarUsername = await Registro.find({ nombre });
+    const buscarUsername = await Registro.find({ email : email });
     // En caso de que no este creada le creamos
     if (buscarUsername.length === 0) {
       const user = new Registro({ nombre, apellido, direccion, password, email, confirmEmail, admin, telefono });
