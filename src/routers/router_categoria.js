@@ -1,7 +1,7 @@
 // Importamos express
 const express = require('express');
 // Importamos la proteccion de rutas del administrador
-cons = require('../helpers/permiso_admin');
+const verificadoAdministrador = require('../helpers/permiso_admin');
 // Importamos los controladores
 const {
     mostrarCategorias,
@@ -24,13 +24,13 @@ routerCategoria.get('/categoria/listar', mostrarCategorias);
 routerCategoria.get('/categoria/buscar/:id', buscarCategoria);
 
 // Ruta para ver agregar una categoria
-routerCategoria.post('/categoria/registro', registrarCategoria);
+routerCategoria.post('/categoria/registro', verificadoAdministrador, registrarCategoria);
 
 // Ruta para ver actualizar una categoria
-routerCategoria.put('/categoria/actualizar/:id', actualizarCategoria);
+routerCategoria.put('/categoria/actualizar/:id', verificadoAdministrador, actualizarCategoria);
 
 // Ruta para ver borrar una categoria
-routerCategoria.delete('/categoria/borrar/:id', borrarCategoria);
+routerCategoria.delete('/categoria/borrar/:id', verificadoAdministrador, borrarCategoria);
 
 // Exportamos routerCategoria
 module.exports = routerCategoria;
