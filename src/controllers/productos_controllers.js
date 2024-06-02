@@ -40,7 +40,7 @@ const buscarProducto = async (req, res) => {
     const ProductoId = req.params.id
     try{
         // Buscamos en la base de datos ese Producto
-        const Productos = await Producto.find({ ProductoId })
+        const Productos = await Producto.find({ _id : ProductoId })
         // En caso de que no exista ese Producto enviamos un mensaje
         if (!Productos || Productos.length === 0) return res.json({ message: 'No existe ese Producto' });
         // Modificamos el nombre del Producto para tener la primera inicial en mayúscula y las demás en minúscula
