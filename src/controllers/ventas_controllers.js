@@ -430,16 +430,19 @@ const buscarVentaAdministrador = async (req, res) => {
     // Declaramos el inicio y el fin de las fechas
     const inicio = new Date(fecha)
     const fin = new Date(fecha)
+    // Configurar la hora para indicar el final del día 
+    fin.setUTCHours(23, 59, 59, 999); 
     try {
         // Buscamos los Ventas en la bdd
-        const cliente = await Cajero.findOne({ telefono : telefono })
+        let cliente = await Cajero.findOne({ telefono : telefono })
+        cliente = cliente.id
         // En caso de que no existan Ventas enviamos un mensaje
         if(!cliente || cliente.length === 0) return res.json({ message : 'No ese Cajero'})
         const Ventas = await Venta.find({
-            cliente : cliente.id,
+            cliente : cliente,
             fecha : {
-                $gte : new Date(inicio.setHours(0,0,0,0)),
-                $lt : new Date(fin.setHours(23,59,59,999))
+                $gte : inicio,
+                $lt : fin
             }
         })
         // Mostramos los Ventas

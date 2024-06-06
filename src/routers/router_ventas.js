@@ -30,7 +30,7 @@ routerVentas.use(express.json());
 routerVentas.get('/ventas/admin/mostrar', verificadoEmpleados, mostrarVentasAdministrador)
 
 // Ruta para que el administrador pueda buscar un pedido
-routerVentas.get('/ventas/admin/mostrar/:id', verificadoEmpleados, buscarVentaAdministrador)
+routerVentas.get('/ventas/admin/buscar', verificadoEmpleados, buscarVentaAdministrador)
 
 // Ruta para ver todos las ventas realizados
 routerVentas.get('/ventas/mostrar', verificadoEmpleados, mostrarVentas);
