@@ -33,43 +33,43 @@ routerVentas.get('/ventas/admin/mostrar', verificadoEmpleados, mostrarVentasAdmi
 routerVentas.get('/ventas/admin/mostrar/:id', verificadoEmpleados, buscarVentaAdministrador)
 
 // Ruta para ver todos las ventas realizados
-routerVentas.post('/ventas/mostrar', verificadoEmpleados, mostrarVentas);
+routerVentas.get('/ventas/mostrar', verificadoEmpleados, mostrarVentas);
 
 // Ruta para ver buscar un pedido realizado
-routerVentas.post('/ventas/buscar/:id', verificadoEmpleados, buscarVenta);
+routerVentas.get('/ventas/buscar/:id', verificadoEmpleados, buscarVenta);
 
 // Ruta para registrar el pedido
 routerVentas.post('/ventas/registro', verificadoEmpleados, CajeroVenta);
 
 // Ruta para ver todos los productos del pedido
-routerVentas.post('/ventas/listar', verificadoEmpleados, listarProductosVenta);
+routerVentas.get('/ventas/listar', verificadoEmpleados, listarProductosVenta);
 
 // Ruta para agregar un producto al pedido
 routerVentas.post('/ventas/agregar', verificadoEmpleados, agregarProductoVenta);
 
 // Ruta para borrar un producto del pedido
-routerVentas.post('/ventas/borrar/:id', verificadoEmpleados, borrarProductoVenta);
+routerVentas.delete('/ventas/borrar/:id', verificadoEmpleados, borrarProductoVenta);
 
 // Ruta para actualizar algun producto del pedido
-routerVentas.post('/ventas/actualizar/:id', verificadoEmpleados, actualizarProductoVenta);
+routerVentas.put('/ventas/actualizar/:id', verificadoEmpleados, actualizarProductoVenta);
 
 // Ruta para eliminar todo el pedido
-routerVentas.post('/ventas/eliminar', verificadoEmpleados, eliminarVenta);
+routerVentas.delete('/ventas/eliminar', verificadoEmpleados, eliminarVenta);
 
 // Ruta para ver los pedidos de los clientes
-routerVentas.post('/ventas/cliente', verificadoEmpleados, verPedidosClientes)
+routerVentas.get('/ventas/cliente', verificadoEmpleados, verPedidosClientes)
 
 // Ruta para ver pedidos de los clientes segun su estado
-routerVentas.post('/ventas/cliente/estado/:estado', verificadoEmpleados, verPedidosEstadoClientes)
+routerVentas.get('/ventas/cliente/estado/:estado', verificadoEmpleados, verPedidosEstadoClientes)
 
 // Ruta para ver el pedidos de cliente
-routerVentas.post('/ventas/cliente/:pedido', verificadoEmpleados, PrepararPedidoCliente)
+routerVentas.get('/ventas/cliente/:pedido', verificadoEmpleados, PrepararPedidoCliente)
 
 // Ruta para cambiar el estado del pedido
-routerVentas.post('/ventas/cliente/enviado/:pedido', verificadoEmpleados, EnviarPedidoCliente)
+routerVentas.get('/ventas/cliente/enviado/:pedido', verificadoEmpleados, EnviarPedidoCliente)
 
 // Ruta para ver el pedidos de cliente
-routerVentas.post('/ventas/cliente/pagado/:pedido', verificadoEmpleados, PagadoPedidoCliente)
+routerVentas.get('/ventas/cliente/pagado/:pedido', verificadoEmpleados, PagadoPedidoCliente)
 
 // Exportamos routerVentas
 module.exports = routerVentas

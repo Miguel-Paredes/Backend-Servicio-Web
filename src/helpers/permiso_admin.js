@@ -6,6 +6,7 @@ const verificadoAdministrador = async (req, res, next) => {
   const cliente = req.body.cliente
   // Buscamos en el la bdd si el administrador inicio sesion o no
   const sesion = await Registro.findOne({ id : cliente })
+  if(!sesion || sesion.length === 0) return res.redirect(`${process.env.URL}/login`);
   // Si existe un inicio de sesion del administrador
   if(sesion.inicioSesion == true && sesion.admin == true){
     // Continuar

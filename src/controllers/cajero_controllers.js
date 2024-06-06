@@ -10,7 +10,7 @@ const inicioCajero = async (req, res, next) => {
   try {
     // Buscamos el correo en la base de datos
     const user = await Cajero.findOne({ email });
-    if(!user || user.lenght === 0) return next();
+    if(!user || user.length === 0) return next();
     // En caso de que el cajero ya haya iniciado sesion
     if(user.inicioSesion == true) return res.json({ message : 'El Cajero ya inicio sesion'})
     // Desincriptamos la contraseña
@@ -155,7 +155,7 @@ const cierreSesionCajero = async (req, res, next) => {
     try {
       // Buscamos el correo en la base de datos
       const user = await Cajero.findOne({ email });
-      if(!user || user.lenght === 0) return next();
+      if(!user || user.length === 0) return next();
       // En caso de que el cajero ya haya iniciado sesion
       else if(user.inicioSesion == false) return res.json({ message : 'El Cajero no inicio sesion'})
       // En caso de que el usuario sea incorrecto indicamos enviamos un mensaje

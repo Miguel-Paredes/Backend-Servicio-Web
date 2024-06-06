@@ -120,8 +120,12 @@ const actualizarProductoVenta = async (req, res) => {
             {cantidad},
             { new : true}
         )
+        cantidad = busProducto.cantidad - cantidad + busProductoVenta.cantidad
+        // Actualizamos el stock
+        await Producto.findByIdAndUpdate(producto, { cantidad : cantidad}, { new : true })
         // Guardamos los cambios en la base de datos
         await productoVentaActualizado.save()
+        cantidad = productoVentaActualizado.cantidad
         // Mostramos al cliente la informacion pero el nombre del producto la primera es mayuscula y el resto minuscula
         productoActualizado = {
             'Producto' : busProducto.nombre.charAt(0).toUpperCase() + busProducto.nombre.slice(1).toLowerCase(),

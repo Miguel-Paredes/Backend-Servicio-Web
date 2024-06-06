@@ -10,8 +10,9 @@ const verificadoEmpleados = async (req, res, next) => {
   const sesionAdmin = await Registro.findOne({ id : cliente })
   // Buscamos en el la bdd si el administrador inicio sesion o no
   const sesionCajero = await Cajero.findOne({ id : cliente })
+  if( (sesionAdmin.length === 0 || !sesionAdmin) && (sesionCajero.length == 0 || !sesionCajero) ) return res.redirect(`${process.env.URL}/login`);
   // Si existe un inicio de sesion del administrador
-  if( (sesionAdmin.inicioSesion == true && sesionAdmin.admin == true) || sesionCajero.inicioSesion == true ){
+  else if( (sesionAdmin.inicioSesion == true && sesionAdmin.admin == true) || sesionCajero.inicioSesion == true ){
     // Continuar
     return next();
   }else{

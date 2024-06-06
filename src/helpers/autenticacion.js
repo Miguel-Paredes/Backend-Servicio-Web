@@ -7,7 +7,8 @@ const verificadoAutentication = async (req, res, next) => {
   // Buscamos en el la bdd si el cliente inicio sesion o no
   const sesion = await Registro.findOne({ _id : cliente })
   // Si existe un inicio de sesion
-  if(sesion.inicioSesion == true && sesion.admin == false){
+  if(!sesion || sesion.length === 0) return res.redirect(`${process.env.URL}/login`);
+  else if(sesion.inicioSesion == true && sesion.admin == false){
     // Continuar
     return next();
   }else{

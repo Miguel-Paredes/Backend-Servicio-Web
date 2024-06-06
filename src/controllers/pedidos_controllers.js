@@ -14,7 +14,7 @@ const Registro = require ('../models/login.js')
 const Carrito = require ('../models/carrito.js');
 
 // Importamos sendMailToConfirmBuyOfUser, sendMailToAdmin, sendMailToAdminToUpdateProduct
-const { sendMailToConfirmBuyOfUser, sendMailToAdmin, sendMailToAdminToUpdateProduct } = require('../config/nodemailer.js');
+const { sendMailToConfirmBuyOfUser, sendMailToAdminToUpdateProduct } = require('../config/nodemailer.js');
 
 
 const agregarProductoPedido = async (req, res) => {
@@ -81,7 +81,8 @@ const agregarProductoPedido = async (req, res) => {
 const actualizarProductoPedido = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades cliente y cantidad en variables separadas 
-    const { cliente, cantidad } = req.body
+    const cliente = req.body.cliente
+    let cantidad = req.body.cantidad
     // Extraemos el id del producto de la url
     const producto = req.params.id
     // Validar todos los campos llenos
@@ -99,7 +100,7 @@ const actualizarProductoPedido = async (req, res) => {
         const veriProducto = busProducto.nombre
         // Buscamos el producto del pedido en la base de datos
         const busProductoPedido = await Carrito.findOne({producto : veriProducto, cliente : cliente})
-        cantidad -= busProductoVenta.cantidad
+        cantidad -= busProductoPedido.cantidad
         // En caso de que no se encuentre ese producto enviamos un mensaje
         if(!busProducto || busProducto.length === 0) return res.json({ message : 'No existe ese producto' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
@@ -108,15 +109,19 @@ const actualizarProductoPedido = async (req, res) => {
         if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'No existe ese producto en el pedido' })
         // Verificamos en stock que cantidad de producto tenemos
         if(cantidad > busProducto.cantidad) return res.json({ message : `Solo tenemos en stock ${busProducto.cantidad+cantidad}`})
-        cantidad += busProductoVenta.cantidad
+        cantidad += busProductoPedido.cantidad
         // Actualizamos el producto
         const productoPedidoActualizado = await Carrito.findByIdAndUpdate(
             busProductoPedido._id,
             {cantidad},
             { new : true}
         )
+        cantidad = busProducto.cantidad - cantidad + busProductoPedido.cantidad
+        // Actualizamos el stock
+        await Producto.findByIdAndUpdate(producto, { cantidad : cantidad}, { new : true })
         // Guardamos los cambios en la base de datos
         await productoPedidoActualizado.save()
+        cantidad = productoPedidoActualizado.cantidad
         // Mostramos al cliente la informacion pero el nombre del producto la primera es mayuscula y el resto minuscula
         productoActualizado = {
             'Producto' : busProducto.nombre.charAt(0).toUpperCase() + busProducto.nombre.slice(1).toLowerCase(),
@@ -191,11 +196,11 @@ const eliminarPedido = async (req, res) => {
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'Ese cliente no se encuentra haciendo un pedido' })
         for(i = 0 ; i < busProductoPedido.length ; i++){
-            const nombre = busProductoVenta[i].producto
+            const nombre = busProductoPedido[i].producto
             const product = await Producto.findOne({ nombre : nombre})
             const id = product.id
             let stock = product.cantidad
-            const cantidad = busProductoVenta[i].cantidad
+            const cantidad = busProductoPedido[i].cantidad
             stock += cantidad
             await Producto.findByIdAndUpdate(id, { cantidad : stock }, { new : true})
             await Carrito.findByIdAndDelete(busProductoPedido[i]._id)
@@ -355,9 +360,8 @@ const registroPedido = async (req, res) => {
         if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'Ese cliente no se encuentra haciendo un pedido' })
         const busPedido = await Pedido.find({ cliente : cliente })
         if(busPedido.length > 0 ) {
-            if(busPedido[busPedido.length - 1] != 'Pagado'){
-                res.json({ message : `Antes de realizar otro pedido pague el anterior, el valor a pagar es de ${busPedido[busPedido.length - 1].total}`})
-            }
+            if(busPedido[busPedido.length - 1] != 'Pagado')
+                return res.json({ message : `Antes de realizar otro pedido pague el anterior, el valor a pagar es de ${busPedido[busPedido.length - 1].total}`})
         }
         // Creamos una nueva instancia 
         const nuevoPedido = new Pedido({
@@ -405,15 +409,10 @@ const registroPedido = async (req, res) => {
         nuevoPedido.total = total;
         // Guardamos en la base de datos
         await nuevoPedido.save()
-// const email = busCliente.email
-// const pedido = String(nuevoPedido._id)
-// const telefono = busCliente.telefono
-// // Enviamos un correo al cliente respecto a su pedido
-// await sendMailToConfirmBuyOfUser(email, pedido)
-// // Enviamos un correo al administrador con el pedido del cliente luego de 5 segundos de haber enviado el correo al cliente
-// setTimeout(async () => {
-//     await sendMailToAdmin(pedido, telefono);
-//   }, 5000);
+        const email = busCliente.email
+        const pedido = String(nuevoPedido._id)
+        // Enviamos un correo al cliente respecto a su pedido
+        await sendMailToConfirmBuyOfUser(email, pedido)
         // Enviamos un mensaje
         res.json({ message : 'Pedido realizado con exito', Pedido : mostrar })
     }catch(err){
