@@ -62,18 +62,18 @@ const registrarFavorito = async (req, res) => {
         const producto = await Producto.findById(req.body.producto);
         // Buscamos el cliente
         const cliente = await Registro.findById(req.body.cliente);
+        // Verificamos si el producto y el cliente existen
+        if(!cliente && !producto) return res.json({ message: 'El producto y el cliente no existen' });
+        // Verificamos si el producto existe
+        if (!producto) return res.json({ message: 'El producto no existe' });
+        // Verificamos si el cliente existe
+        if (!cliente) return res.json({ message: 'El cliente no existe' });
         // Almacenamos el id de producto
         const idProducto = producto.id
         // Buscamos el producto en la lista de favoritos
         const favoritos = await Favorito.find({ cliente : cliente, producto : idProducto })
-        // Verificamos si el producto y el cliente existen
-        if(!cliente && !producto) return res.json({ message: 'El producto y el cliente no existen' });
-        // Verificamos si el producto existe
-        else if (!producto) return res.json({ message: 'El producto no existe' });
-        // Verificamos si el cliente existe
-        else if (!cliente) return res.json({ message: 'El cliente no existe' });
         // En caso de que el producto ya se encuentre en favoritos enviamos un mensaje
-        if(favoritos) return res.json({ message : 'Ese producto ya se encuentra en favoritos'})
+        if(favoritos != 0) return res.json({ message : 'Ese producto ya se encuentra en favoritos'})
         // Creamos una nueva instancia de Favorito
         const nuevoFavorito = new Favorito({
             _id: new mongoose.Types.ObjectId(),
