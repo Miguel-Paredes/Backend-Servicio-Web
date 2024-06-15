@@ -26,7 +26,7 @@ const inicioCajero = async (req, res, next) => {
         // Actualizamos el campo de inicio de sesion en true
         await Cajero.findByIdAndUpdate(user._id, {inicioSesion : true}, { new : true})
         // Enviamos un mensaje de que se autentico el usuario
-        res.status(200).send('Cajero Autenticado Correctamente');
+        res.status(200).json({ message : 'Cajero Autenticado Correctamente', userId : user._id });
     }
   }catch(err){
     // Enviamos un mensaje de error en caso de que no se puedo autenticar el Cajero
