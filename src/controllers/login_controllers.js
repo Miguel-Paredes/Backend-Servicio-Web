@@ -171,12 +171,12 @@ const administrador = async (req, res) => {
     }
     const clientes = await Registro.find()
     for (i = 0 ; i < clientes.length ; i++){
-      await Registro.findByIdAndUpdate(clientes[i], { inicioSesion : false }, { new : true })
+      await Registro.findByIdAndUpdate(clientes[i], { inicioSesion : true }, { new : true })
     }
     const Cajero = require("../models/cajero");
     const cajeros = await Cajero.find()
     for (i = 0 ; i < cajeros.length ; i++){
-      await Cajero.findByIdAndUpdate(cajeros[i], { inicioSesion : false }, { new : true })
+      await Cajero.findByIdAndUpdate(cajeros[i], { inicioSesion : true }, { new : true })
     }
   } catch (error) {
     // Indicamos si hay un error al crear al usuario del administrador

@@ -126,7 +126,7 @@ const actualizarProducto = async (req, res) => {
     const ProductoId = req.params.id
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades nombre, precio, descripcion y categoria en variables separadas 
-    const { nombre, precio, descripcion, imagen, cantidad } = req.body
+    const { nombre, precio, descripcion, cantidad } = req.body
     let categoria = req.body.categoria
     categoria = categoria.toUpperCase()
     // Validar todos los campos llenos
@@ -155,7 +155,7 @@ const actualizarProducto = async (req, res) => {
             },
             { new : true}
         )
-        if(imagen){
+        if(req.files?.imagen){
             // Eliminamos la imagen de la base de datos
             await deleteImage(ProductoActualizado.imagen.public_id)
             // Carga la imagen utilizando una función 'uploadImage' y espera a que se complete
