@@ -5,3 +5,6 @@ http
 uploads
 imagenes
 pruebas
+pruebas unitarias
+testDatabase.js
+pruebas de carga

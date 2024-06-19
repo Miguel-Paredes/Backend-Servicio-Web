@@ -78,9 +78,9 @@ const actualizarCajero = async (req, res) => {
             // Si no existe ese cajero enviamos un mensaje 
             res.json({ message : 'No existe ese Cajero' })
         }else{
-            // Si existe actualizamos y enviamos un mensaje
-            const user = await Cajero.findByIdAndUpdate(exisCorreo._id, req.body, { new : true })
-            res.json({ message : 'Cajero Actualizado', Cajero : user })
+            exisCorreo.password = req.body.password
+            await exisCorreo.save()
+            res.json({ message : 'Cajero Actualizado', Cajero : exisCorreo })
         }
     }catch(err){
         // Enviamos un mensaje de error en caso de que no se puedo actualizar el Cajero
