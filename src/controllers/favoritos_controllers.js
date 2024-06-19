@@ -10,7 +10,7 @@ const mongoose = require ('mongoose')
 const mostrarFavoritos = async (req, res) => {
     try {
         // Buscamos en la base de datos los Favoritos de un cliente en especifico
-        const Favoritos = await Favorito.find({ cliente: req.body.cliente });
+        const Favoritos = await Favorito.find({ cliente: req.query.cliente });
         // En caso de que no existan Favoritos registrados, enviamos un mensaje
         if (!Favoritos || Favoritos.length === 0) return res.json({ message: 'No existen Favoritos' });
         // Modificamos el nombre de cada Favorito para tener la primera inicial en mayúscula
@@ -36,7 +36,7 @@ const buscarFavorito = async (req, res) => {
     const FavoritoId = req.params.id
     try{
         // Buscamos en la base de datos ese Favorito
-        const Favoritos = await Favorito.find({ _id : FavoritoId, cliente : req.body.cliente })
+        const Favoritos = await Favorito.find({ _id : FavoritoId, cliente : req.query.cliente })
         // En caso de que no exista ese Favorito enviamos un mensaje
         if (!Favoritos || Favoritos.length === 0) return res.json({ message: 'No existe ese Favorito' });
         // Modificamos el nombre del Favorito para tener la primera inicial en mayúscula y las demás en minúscula
@@ -222,12 +222,12 @@ const categoriaFavorito = async (req, res) => {
     // Colocamos el nombre en mayuscula
     categoriaID = categoriaID.toUpperCase()
     // Obtenemos el id del cliente del body
-    const cliente = req.body.cliente
+    const cliente = req.query.cliente
     try{
         // Buscamos en la base de datos ese Favorito
         const Favoritos = await Favorito.find({ categoria : categoriaID, cliente : cliente })
         // En caso de que no exista ese Favorito enviamos un mensaje
-        if (!Favoritos || Favoritos.length === 0) return res.json({ message: 'No existe ese Favorito' });
+        if (!Favoritos || Favoritos.length === 0) return res.json({ message: 'No existen Favoritos en esa categoria' });
         // Modificamos el nombre del Favorito para tener la primera inicial en mayúscula y las demás en minúscula
         const listarFavoritos = Favoritos.map(Favorito => {
             const nombreFavorito = Favorito.nombre.charAt(0).toUpperCase() + Favorito.nombre.slice(1).toLowerCase();
