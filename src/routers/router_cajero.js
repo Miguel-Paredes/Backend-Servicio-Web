@@ -24,10 +24,10 @@ routerCajero.use(express.json())
 routerCajero.post('/cajeros/registro', validacionCajero, verificadoAdministrador, crearCajero )
 
 // Ruta para actualizar un cajero
-routerCajero.put('/cajeros/actualizar', validacionCajero, verificadoAdministrador, actualizarCajero)
+routerCajero.put('/cajeros/actualizar/:id', validacionCajero, verificadoAdministrador, actualizarCajero)
 
 // Ruta para borrar un cajero
-routerCajero.delete('/cajeros/eliminar', verificadoAdministrador, borrarCajero)
+routerCajero.delete('/cajeros/eliminar/:id', verificadoAdministrador, borrarCajero)
 
 // Ruta para mostrar los cajeros
 routerCajero.get('/cajeros/mostrar', verificadoAdministrador, mostrarCajeros)

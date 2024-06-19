@@ -68,7 +68,7 @@ const crearCajero = async (req, res) => {
 const actualizarCajero = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos la propiedad email una variable
-    const email = req.body.email
+    const email = req.params.id
     try {
         // Validar todos los campos llenos
         if (Object.values(req.body).includes('')) return res.status(400).json({msg:'Lo sentimos, debes llenar todos los campos'})
@@ -93,7 +93,7 @@ const actualizarCajero = async (req, res) => {
 const borrarCajero = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos la propiedad email una variable
-    const email = req.body.email
+    const email = req.params.id
     try {
         // Buscamos el correo en la base de datos
         const exisCorreo = await Cajero.findOne({ email })
