@@ -186,10 +186,10 @@ const administrador = async (req, res) => {
 
 const cierreSesionLogin = async (req, res) => {
   // Almacenamos el email del usuario para poder cerrar sesión
-  const email = req.body.email;
+  const cliente = req.query.cliente;
   try {
     // Buscamos el correo en la base de datos
-    const user = await Registro.findOne({ email });
+    const user = await Registro.findOne({ cliente });
     // Verificamos si iniciaron sesion
     if(user.inicioSesion == false) return res.json({ message : 'Ese usuario no inicio sesion'})
     // Cerramos la sesion

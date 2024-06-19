@@ -48,7 +48,7 @@ routerLogin.get('/login/recuperar-password/:token', comprobarTokenPasword)
 routerLogin.post('/login/nuevo-password/:token', nuevoPassword)
 
 // Ruta para cerrar la sesion
-routerLogin.post('/login/cierre', cierreSesionCajero, cierreSesionLogin)
+routerLogin.get('/login/cierre', cierreSesionCajero, cierreSesionLogin)
 
 // Exportamos routerLogin
 module.exports = routerLogin
