@@ -360,7 +360,7 @@ const registroPedido = async (req, res) => {
         if(!busProductoPedido || busProductoPedido.length === 0) return res.json({ message : 'Ese cliente no se encuentra haciendo un pedido' })
         const busPedido = await Pedido.find({ cliente : cliente })
         if(busPedido.length > 0 ) {
-            if(busPedido[busPedido.length - 1] != 'Pagado')
+            if(busPedido[busPedido.length - 1].estado != 'Pagado')
                 return res.json({ message : `Antes de realizar otro pedido pague el anterior, el valor a pagar es de ${busPedido[busPedido.length - 1].total}`})
         }
         // Almacenamos el nombre del cliente en una variable

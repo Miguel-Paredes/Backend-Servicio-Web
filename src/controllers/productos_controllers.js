@@ -215,7 +215,7 @@ const categoriaProducto = async (req, res) => {
         // Buscamos en la base de datos ese Producto
         const productoCategoria = await Producto.find({ categoria : categoria })
         // En caso de que no exista esa categoria de Producto enviamos un mensaje
-        if(!productoCategoria) return res.json({ message : 'No existe esa categoria de producto' })
+        if(!productoCategoria || productoCategoria.length === 0) return res.json({ message : 'No hay productos con esa categoria' })
         // Modificamos el nombre de cada Producto para tener la primera inicial en mayúscula
         // y las demás en minúscula
         const listarProductos = productoCategoria.map(Producto => {
