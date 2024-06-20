@@ -11,6 +11,7 @@ const pedidoSchema = mongoose.Schema({
         required : true
     },
     // TODO
+    nombre:{ type : String, required : true, trim : true },
     producto : [{
         type : mongoose.Schema.Types.String,
         ref : "Producto",

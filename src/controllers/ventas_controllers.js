@@ -221,7 +221,7 @@ const eliminarVenta = async (req, res) => {
 const listarProductosVenta = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades clientes en una variable
-    const cliente = req.body.cliente
+    const cliente = req.query.cliente
     // Creamos una variable para calcular el total del Venta
     let total = 0
     // Validar todos los campos llenos
@@ -270,7 +270,7 @@ const listarProductosVenta = async (req, res) => {
 const mostrarVentas = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades cliente en una variable
-    const cliente = req.body.cliente
+    const cliente = req.query.cliente
     // Validar todos los campos llenos
     if (Object.values(req.body).includes('')) return res.status(400).json({ message : 'Lo sentimos, debes llenar todos los campos' })
     try{
@@ -303,7 +303,7 @@ const mostrarVentas = async (req, res) => {
 const buscarVenta = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades cliente en una variable
-    const cliente = req.body.cliente
+    const cliente = req.query.cliente
     // Extraemos la id de la url
     const VentaId = req.params.id
     // Validar todos los campos llenos
@@ -352,10 +352,13 @@ const CajeroVenta = async (req, res) => {
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese Cajero' })
         // En caso de que no se encuentre ese producto en el Venta enviamos un mensaje
         if(!busProductoVenta || busProductoVenta.length === 0) return res.json({ message : 'Ese Cajero no se encuentra haciendo un Venta' })
+        // Almacenamos el nombre del cajero en una variable
+        const nombreCajero = busCliente.username
         // Creamos una nueva instancia 
         const nuevoVenta = new Venta({
             _id : new mongoose.Types.ObjectId,
             cliente : cliente,
+            cajero : nombreCajero,
             producto : [],
             cantidad : [],
             precio : [],

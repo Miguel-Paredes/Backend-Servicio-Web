@@ -217,7 +217,7 @@ const eliminarPedido = async (req, res) => {
 const listarProductosPedido = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades clientes en una variable
-    const cliente = req.body.cliente
+    const cliente = req.query.cliente
     // Creamos una variable para calcular el total del pedido
     let total = 0
     // Validar todos los campos llenos
@@ -266,7 +266,7 @@ const listarProductosPedido = async (req, res) => {
 const mostrarPedidos = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades cliente en una variable
-    const cliente = req.body.cliente
+    const cliente = req.query.cliente
     // Validar todos los campos llenos
     if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
     try{
@@ -299,7 +299,7 @@ const mostrarPedidos = async (req, res) => {
 const buscarPedido = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos las propiedades cliente en una variable
-    const cliente = req.body.cliente
+    const cliente = req.query.cliente
     // Extraemos la id de la url
     const PedidoId = req.params.id
     // Validar todos los campos llenos
@@ -363,10 +363,13 @@ const registroPedido = async (req, res) => {
             if(busPedido[busPedido.length - 1] != 'Pagado')
                 return res.json({ message : `Antes de realizar otro pedido pague el anterior, el valor a pagar es de ${busPedido[busPedido.length - 1].total}`})
         }
+        // Almacenamos el nombre del cliente en una variable
+        const nombreCliente = busCliente.nombre + ' ' + busCliente.apellido
         // Creamos una nueva instancia 
         const nuevoPedido = new Pedido({
             _id : new mongoose.Types.ObjectId,
             cliente : cliente,
+            nombre : nombreCliente,
             producto : [],
             cantidad : [],
             precio : [],
