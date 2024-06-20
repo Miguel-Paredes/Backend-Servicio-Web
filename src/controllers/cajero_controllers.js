@@ -74,7 +74,7 @@ const actualizarCajero = async (req, res) => {
         if (Object.values(req.body).includes('')) return res.status(400).json({msg:'Lo sentimos, debes llenar todos los campos'})
         // Buscamos el correo en la base de datos
         const exisCorreo = await Cajero.findOne({ email })
-        if(exisCorreo.length === 0 || !exisCorreo) {
+        if(!exisCorreo || exisCorreo.length === 0) {
             // Si no existe ese cajero enviamos un mensaje 
             res.json({ message : 'No existe ese Cajero' })
         }else{
