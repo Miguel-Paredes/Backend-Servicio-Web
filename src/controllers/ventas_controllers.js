@@ -338,7 +338,7 @@ const buscarVenta = async (req, res) => {
 const CajeroVenta = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos la propiedad cliente en una variable
-    const cliente = req.query.cliente
+    const cliente = req.body.cliente
     // Validar todos los campos llenos
     if (Object.values(req.body).includes('')) return res.status(400).json({ message : 'Lo sentimos, debes llenar todos los campos' })
     // Creamos variables temporales que nos serviran para poder hacer calculos
