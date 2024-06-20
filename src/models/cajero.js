@@ -10,6 +10,7 @@ const saltRounds = 10;
 const CajeroSchema = new mongoose.Schema({
   // TODO
   username : { type : String, required : true },
+  cajero : { type : String, required : true },
   password : { type : String, required : true },
   email : { type : String, require  : true, unique  : true},
   telefono : { type : Number, require : true, unique : true },
