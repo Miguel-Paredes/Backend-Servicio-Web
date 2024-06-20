@@ -68,12 +68,12 @@ const crearCajero = async (req, res) => {
 const actualizarCajero = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos la propiedad email una variable
-    const email = req.params.id
+    const id = req.params.id
     try {
         // Validar todos los campos llenos
         if (Object.values(req.body).includes('')) return res.status(400).json({msg:'Lo sentimos, debes llenar todos los campos'})
         // Buscamos el correo en la base de datos
-        const exisCorreo = await Cajero.findOne({ email })
+        const exisCorreo = await Cajero.findOne({ _id : id })
         if(!exisCorreo || exisCorreo.length === 0) {
             // Si no existe ese cajero enviamos un mensaje 
             res.json({ message : 'No existe ese Cajero' })
