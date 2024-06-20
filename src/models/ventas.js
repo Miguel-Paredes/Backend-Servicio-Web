@@ -10,6 +10,7 @@ const ventaSchema = mongoose.Schema({
         ref : "Cajero",
         required : true
     },
+    cajero : { type : String, required : true },
     // TODO
     producto : [{
         type : mongoose.Schema.Types.String,
