@@ -15,7 +15,8 @@ const {
     verPedidosEstadoClientes,
     PrepararPedidoCliente,
     EnviarPedidoCliente,
-    PagadoPedidoCliente
+    PagadoPedidoCliente,
+    verVenta
 } = require('../controllers/ventas_controllers.js');
 // Importamos la autentificacion de los empleados
 const verificadoEmpleados = require('../helpers/permiso_empleados');
@@ -31,6 +32,9 @@ routerVentas.get('/ventas/admin/mostrar', verificadoEmpleados, mostrarVentasAdmi
 
 // Ruta para que el administrador pueda buscar un pedido
 routerVentas.get('/ventas/admin/buscar', verificadoEmpleados, buscarVentaAdministrador)
+
+// Ruta para ver la venta de los cajeros
+routerVentas.get('/ventas/cajeros/:id', verificadoEmpleados, verVenta)
 
 // Ruta para ver todos las ventas realizados
 routerVentas.get('/ventas/mostrar', verificadoEmpleados, mostrarVentas);

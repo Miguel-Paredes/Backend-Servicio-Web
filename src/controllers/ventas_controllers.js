@@ -497,16 +497,17 @@ const PrepararPedidoCliente = async (req, res) => {
     const pedido = req.params.pedido
     try {
         // Visualizar todos los pedidos
-        let visualizar = await Pedido.find({ id : pedido})
+        let visualizar = await Pedido.find({ _id : pedido})
         // Si no existen pedidos enviamos un mensaje
         if(visualizar.length === 0 || !visualizar) return res.json({ message : 'No existe ese pedido' })
         // Si el estado del pedido es en espera se actualiza a en preparacion
         if(visualizar[0].estado == 'En espera'){
             // Actualizamos el estado del pedido
-            visualizar = await Pedido.findByIdAndUpdate(pedido, { estado : 'En preparación'}, { new : true })
+            visualizar = await Pedido.findByIdAndUpdate(pedido, {estado : 'En preparación'}, {new : true})
+            console.log(visualizar)
         }
         // Mostramos todos los pedidos
-        res.json(visualizar)
+        res.json(visualizar[0])
     }catch(err){
         // Enviamos un mensaje en caso de que no se pudo mostrar todos los Ventas
         res.json({ message : 'Error al mostrar los Pedidos segun el estado'})
@@ -520,7 +521,7 @@ const EnviarPedidoCliente = async (req, res) => {
     const pedido = req.params.pedido
     try {
         // Visualizar todos los pedidos
-        let visualizar = await Pedido.find({ id : pedido})
+        let visualizar = await Pedido.find({ _id : pedido})
         // Si no existen pedidos enviamos un mensaje
         if(visualizar.length === 0 || !visualizar) return res.json({ message : 'No existe ese pedido' })
         // Si el estado del pedido es en preparacion se actualiza a enviado
@@ -543,7 +544,7 @@ const PagadoPedidoCliente = async (req, res) => {
     const pedido = req.params.pedido
     try {
         // Visualizar todos los pedidos
-        let visualizar = await Pedido.find({ id : pedido})
+        let visualizar = await Pedido.find({ _id : pedido})
         // Si no existen pedidos enviamos un mensaje
         if(visualizar.length === 0 || !visualizar) return res.json({ message : 'No existe ese pedido' })
         // Si el estado del pedido es ennviado se actualiza a pagado
@@ -559,7 +560,25 @@ const PagadoPedidoCliente = async (req, res) => {
         // Mostramos los errores
         console.log(err)
     }
-}  
+}
+
+const verVenta = async (req, res) => {
+    // Extraemos el pedido de la url
+    const id = req.params.id
+    try {
+        // Visualizar todos los pedidos
+        let visualizar = await Venta.find({ _id : id})
+        // Si no existen pedidos enviamos un mensaje
+        if(visualizar.length === 0 || !visualizar) return res.json({ message : 'No existe esa venta' })
+        // Mostramos todos la venta
+        res.json(visualizar[0])
+    }catch(err){
+        // Enviamos un mensaje en caso de que no se pudo mostrar todos los Ventas
+        res.json({ message : 'Error al mostrar los Pedidos segun el estado'})
+        // Mostramos los errores
+        console.log(err)
+    }
+}
 
 module.exports = {
     agregarProductoVenta,
@@ -576,5 +595,6 @@ module.exports = {
     verPedidosEstadoClientes,
     PrepararPedidoCliente,
     EnviarPedidoCliente,
-    PagadoPedidoCliente
+    PagadoPedidoCliente,
+    verVenta
 }
