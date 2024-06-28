@@ -171,13 +171,12 @@ const eliminarFavorito = async (productoId) => {
         // Almacenamos la informacion de productoId en una variable
         const busc = productoId
         // Buscamos el favorito correspondiente al producto
-        const buscarFavorito = await Favorito.find({ _id : productoId})
+        const buscarFavorito = await Favorito.find()
         // Usamos un bucle para que busque en todos los favoritos el producto y los elimine
         for(let i = 0 ; i < buscarFavorito.length ; i++){
-            // Usamos la funcion String para poder comparar mas facilmente
-            if(String(buscarFavorito[i].producto) === String(busc)){
-                // Vamos eliminando cada producto en los favoritos
-                await Favorito.findByIdAndDelete(buscarFavorito[i]._id)
+            if(buscarFavorito[i].producto == productoId){
+                const idProducto = buscarFavorito[i]._id
+                await Favorito.findByIdAndDelete(idProducto)
             }
         }
         // Enviamos un mensaje a consola indicando que ya se eliminaron todos los favoritos
@@ -190,10 +189,10 @@ const eliminarFavorito = async (productoId) => {
     }
 };
 
-const actualizarCategoriaFavorito = async (CategoriaId, categoria) => {
+const actualizarCategoriaFavorito = async (categoria) => {
     try{
         // Buscamos todos los productos con esa categoria
-        const favorito = await Favorito.find({ _id : CategoriaId })
+        const favorito = await Favorito.find()
         // En caso de que no existan productos con esa categoria
         if(favorito.length === 0 || !favorito) return console.log('No existen productos favoritos con esa categoria')
         else{

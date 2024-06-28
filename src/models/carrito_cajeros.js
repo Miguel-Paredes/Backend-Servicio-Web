@@ -10,12 +10,18 @@ const carritoCajeroSchema = mongoose.Schema({
         ref : "Cajero",
         required : true
     },
+    idProducto: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Producto',
+        require: true
+    },
     producto : {
         type : mongoose.Schema.Types.String,
         ref : "Producto",
         required : true,
         index : false
     },
+    imagen : { type: String, require: true },
     cantidad : { type : Number, require : true, trim : true },
     precio : { type : Number, require : true, trim : true }
     // TODO

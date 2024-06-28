@@ -58,7 +58,7 @@ const registrarCategoria = async (req, res) => {
     let categoria = req.body.categoria
     categoria = categoria.toUpperCase()
     // Validar todos los campos llenos
-    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    if (Object.values(req.body).includes("")) return res.json({msg:"Lo sentimos, debes llenar todos los campos"})
     try {
         // Buscamos si el nombre de la Categoria ya se encuentra registrado
         const exisNombre = await Categoria.findOne({ categoria })
@@ -105,9 +105,9 @@ const actualizarCategoria = async (req, res) => {
         // Guardamos el nuevo Categoria en la base de datos
         await CategoriaActualizado.save(); 
         // Llamamos al controlador actualizarCategoriaProducto y pasamos CategoriaId como argumento
-        await actualizarCategoriaProducto(CategoriaId, categoria);
+        await actualizarCategoriaProducto(categoria);
         // Llamamos al controlador actualizarCategoriaFavorito y pasamos CategoriaId como argumento
-        await actualizarCategoriaFavorito(CategoriaId, categoria)
+        await actualizarCategoriaFavorito(categoria)
         // Enviamos un mensaje de Categoria Actualizado y los detalles del Categoria registrado
         res.status(200).json({ message: 'Categoria Actualizado', Categoria: CategoriaActualizado }); 
     }catch (err){
@@ -118,13 +118,14 @@ const actualizarCategoria = async (req, res) => {
     }
 };
 
+
 const borrarCategoria = async (req, res) => {
     // Obtenemos el valor de id de la URL
     const CategoriaId = req.params.id;
     try {
         // Buscamos en la base de datos la categoria del Producto
         const categoriaEliminado = await Categoria.findById(CategoriaId);
-        if (!categoriaEliminado) return res.status(404).json({ message: 'No se encontró la Categoria para borrar' });
+        if (!categoriaEliminado) return res.json({ message: 'No se encontró la Categoria para borrar' });
         const nombreCategoria = categoriaEliminado.categoria
         // Importamos el modelo Producto
         const Producto = require('../models/productos.js');

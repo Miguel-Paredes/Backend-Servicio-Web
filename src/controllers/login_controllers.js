@@ -1,5 +1,7 @@
 // Importamos el modelo Registro
 const Registro = require('../models/login.js');
+// Importamos el modelo de Cajero
+const Cajero = require("../models/cajero");
 // Importamos sendMailToUser-sendMailToRecoveryPassword para poder enviar los respectivos correos
 const { sendMailToUser, sendMailToRecoveryPassword } = require('../config/nodemailer.js');
 
@@ -17,9 +19,9 @@ const inicioLogin = async (req, res) => {
     // Verificamos si ya confirmo la cuenta
     if(user?.confirmEmail===false) return res.status(403).json({msg:'Lo sentimos, debe verificar su cuenta'})
     // En caso de que el administrador ya haya iniciado sesion
-    if(user.inicioSesion == true && user.admin == true) return res.json({ message : 'El administrador ya inicio sesion'})
+    if(user.inicioSesion == true && user.admin == true) return res.json({ message : 'El administrador ya inicio sesion', userId: user._id})
     // En caso de que haya iniciado sesion enviamos un mensaje
-    else if(user.inicioSesion == true) return res.json({ message : 'El usuario ya inicio sesión'})
+    else if(user.inicioSesion == true) return res.json({ message : 'El usuario ya inicio sesión', userId: user._id})
     else{
       // Desincriptamos la contraseña
       const contra = await user.isCorrectPassword(password)
@@ -61,6 +63,14 @@ const registroLogin = async (req, res) => {
     if(exisCorreo) return res.status(400).json({ msg:'Lo sentimos, el email ya se encuentra registrado' })
     // En caso de que exista el telefono enviamos un mensaje
     if(exisTelefono) return res.status(400).json({ msg:'Lo sentimos, el telefono celular ya se encuentra registrado' })
+    // Buscamos el correo en la base de datos del cajero
+    const exisCorreoCajero = await Cajero.findOne({ email })
+    // Buscamos el correo en la base de datos del cajero
+    const exisTelefonoCajero = await Cajero.findOne({ telefono })
+    // En caso de que exista el correo enviamos un mensaje
+    if(exisCorreoCajero) return res.status(400).json({ msg:'Lo sentimos, el email ya se encuentra registrado en los cajeros' })
+    // En caso de que exista el telefono enviamos un mensaje
+    if(exisTelefonoCajero) return res.status(400).json({ msg:'Lo sentimos, el telefono celular ya se encuentra registrado en los cajeros' })
     // Creamos una nueva instancia
     const user = new Registro(req.body);
     // Creamos un token
@@ -171,12 +181,12 @@ const administrador = async (req, res) => {
     }
     const clientes = await Registro.find()
     for (i = 0 ; i < clientes.length ; i++){
-      await Registro.findByIdAndUpdate(clientes[i], { inicioSesion : false }, { new : true })
+      await Registro.findByIdAndUpdate(clientes[i], { inicioSesion : true }, { new : true })
     }
     const Cajero = require("../models/cajero");
     const cajeros = await Cajero.find()
     for (i = 0 ; i < cajeros.length ; i++){
-      await Cajero.findByIdAndUpdate(cajeros[i], { inicioSesion : false }, { new : true })
+      await Cajero.findByIdAndUpdate(cajeros[i], { inicioSesion : true }, { new : true })
     }
   } catch (error) {
     // Indicamos si hay un error al crear al usuario del administrador
@@ -189,13 +199,14 @@ const cierreSesionLogin = async (req, res) => {
   const cliente = req.query.cliente;
   try {
     // Buscamos el correo en la base de datos
-    const user = await Registro.findOne({ cliente });
+    const user = await Registro.findOne({ _id : cliente });
     // Verificamos si iniciaron sesion
     if(user.inicioSesion == false) return res.json({ message : 'Ese usuario no inicio sesion'})
     // Cerramos la sesion
-    await Registro.findByIdAndUpdate(user._id, {inicioSesion : false}, { new : true})
-    // Redireccionamos al login
-    res.redirect(`${process.env.URL}/login`);
+    user.inicioSesion = false
+    user.save()
+    // Enviamos un mensaje de que se cerro la sesion del usuario
+    res.json({ message : 'Adios'})
   } catch (err) {
     // En caso de haber un error, indicamos que no se pudo cerrar la sesión del usuario
     res.status(500).json({ message: 'Error al cerrar la sesión del usuario' });

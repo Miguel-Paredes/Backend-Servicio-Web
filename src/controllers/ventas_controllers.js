@@ -27,6 +27,8 @@ const agregarProductoVenta = async (req, res) => {
     if (Object.values(req.body).includes('')) return res.status(400).json({ message : 'Lo sentimos, debes llenar todos los campos' })
     // Verificamos si se quiere ingresar una cantidad menor a 0
     if(cantidad < 0) return res.json({ message : 'No se puede ingresar una cantidad negativa'})
+    
+    else if(cantidad == 0 ) return res.json({ message : 'No se puede enviar la cantidad en 0'})
     // Verificamos si se quiere ingresar una cantidad mayor a 20
     else if(cantidad > 20) return res.json({ message : 'La cantidad maxima es de 20'})
     let productoAgregado = {}
@@ -38,7 +40,7 @@ const agregarProductoVenta = async (req, res) => {
         // Almacenamos el nombre del producto
         const veriProducto = busProducto.nombre
         // Buscamos el producto del Venta en la base de datos
-        const busProductoVenta = await CarritoCajero.findOne({producto : veriProducto})
+        const busProductoVenta = await CarritoCajero.findOne({producto : veriProducto, cliente: cliente})
         // En caso de que no se encuentre ese producto enviamos un mensaje
         if(!busProducto || busProducto.length === 0) return res.json({ message : 'No existe ese producto' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
@@ -53,7 +55,9 @@ const agregarProductoVenta = async (req, res) => {
             cliente : cliente,
             producto : busProducto.nombre,
             cantidad : cantidad,
-            precio : busProducto.precio
+            precio : busProducto.precio,
+            idProducto : busProducto._id,
+            imagen : busProducto.imagen.secure_url
         })
         // Guardamos en la base de datos
         await nuevoProductoVenta.save()
@@ -242,7 +246,9 @@ const listarProductosVenta = async (req, res) => {
             mostrar[busCliente._id].push({
                 'Producto' : nombreProducto,
                 'Cantidad' : busProductoVenta[i].cantidad,
-                'Precio' : busProductoVenta[i].precio
+                'Precio' : busProductoVenta[i].precio,
+                'idProducto' : busProductoVenta[i].idProducto,
+                'imagen' : busProductoVenta[i].imagen
             })
             // Sacamos el precio del producto
             const precio = busProductoVenta[i].precio
@@ -504,7 +510,6 @@ const PrepararPedidoCliente = async (req, res) => {
         if(visualizar[0].estado == 'En espera'){
             // Actualizamos el estado del pedido
             visualizar = await Pedido.findByIdAndUpdate(pedido, {estado : 'En preparación'}, {new : true})
-            console.log(visualizar)
         }
         // Mostramos todos los pedidos
         res.json(visualizar[0])

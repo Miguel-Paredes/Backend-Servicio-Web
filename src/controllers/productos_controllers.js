@@ -10,6 +10,10 @@ const mongoose = require ('mongoose');
 const { actualizarFavorito, eliminarFavorito } = require('./favoritos_controllers.js');
 // Importamos el modelo Categoria
 const Categoria = require('../models/categoria.js');
+// Importamos el modelo Carrito
+const Carrito = require ('../models/carrito.js');
+// Importamos el modelo CarritoCajero
+const CarritoCajero = require ('../models/carrito_cajeros.js');
 
 const mostrarProductos = async (req, res) => {
     try {
@@ -68,7 +72,7 @@ const registrarProducto = async (req, res) => {
     categoria = categoria.toUpperCase()
     nombre = nombre.toUpperCase()
     // Validar todos los campos llenos
-    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    if (Object.values(req.body).includes("")) return res.json({msg:"Lo sentimos, debes llenar todos los campos"})
     try {
         // Buscamos si el nombre del Producto ya se encuentra registrado
         const exisNombre = await Producto.findOne({ nombre : nombre })
@@ -130,12 +134,16 @@ const actualizarProducto = async (req, res) => {
     let categoria = req.body.categoria
     categoria = categoria.toUpperCase()
     // Validar todos los campos llenos
-    if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
+    if (Object.values(req.body).includes("")) return res.json({msg:"Lo sentimos, debes llenar todos los campos"})
     try{
         // Buscamos el producto por el id
         let ProductoActualizado = await Producto.findById( ProductoId )
         // Buscamos si la categoria del Producto existe
-        const exisCategoria = await Categoria.findOne({ categoria : categoria })
+        const exisCategoria = await Categoria.findOne({ categoria })
+        // Verificamos que no exista un producto con ese mismo nombre
+        // if (ProductoActualizado && ProductoActualizado.nombre !== nombre) {
+        //     return res.json({ message: 'Ya existe un producto con ese nombre.' });
+        // }
         if(!ProductoActualizado) return res.status(404).json({ message : 'No se encontro el Producto para actualizar'})
         // Colocamos condicionales para evitar que se ingresen numeros negativos
         // En caso de que el precio menor a 0 enviamos un mensaje
@@ -196,6 +204,24 @@ const borrarProducto = async (req, res) => {
         await deleteImage(productoEliminado.imagen.public_id);
         // Eliminamos el Producto de la base de datos
         await Producto.findByIdAndDelete(productoId);
+        // Eliminamos el producto del carrito del cliente
+        const carritoCliente = await Carrito.find()
+        if(!carritoCliente || carritoCliente.length === 0){console.log('No hay productos en el carrito de clientes')}
+        else{
+            for(i = 0 ; i < carritoCliente.length ; i++){
+                const idProducto = carritoCliente[i]._id
+                const Products = await Carrito.findByIdAndDelete(idProducto)
+            }
+        }
+        // Eliminamos el producto del carrito del cliente
+        const carritoCajero = await CarritoCajero.find()
+        if(!carritoCajero || carritoCajero.length === 0){console.log('No hay productos en el carrito de ventas')}
+        else{
+            for(i = 0 ; i < carritoCajero.length ; i++){
+                const idProducto = carritoCajero[i]._id
+                await CarritoCajero.findByIdAndDelete(idProducto)
+            }
+        }
         // Enviamos un mensaje indicando que se borró el Producto
         res.status(200).json({ message: 'Producto borrado' });
     } catch (err) {
@@ -234,10 +260,10 @@ const categoriaProducto = async (req, res) => {
     }
 };
 
-const actualizarCategoriaProducto = async (CategoriaId, categoria) => {
+const actualizarCategoriaProducto = async (categoria) => {
     try{
         // Buscamos todos los productos con esa categoria
-        const producto = await Producto.find({ _id : CategoriaId })
+        const producto = await Producto.find()
         // En caso de que no existan productos con esa categoria
         if(producto.length === 0 || !producto) return console.log('No existen productos con esa categoria')
         // En caso de que si existan

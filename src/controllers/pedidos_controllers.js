@@ -25,22 +25,23 @@ const agregarProductoPedido = async (req, res) => {
     if (Object.values(req.body).includes('')) return res.status(400).json({ message: 'Lo sentimos, debes llenar todos los campos' })
     // Verificamos si se quiere ingresar una cantidad menor a 0
     if(cantidad < 0) return res.json({ message : 'No se puede ingresar una cantidad negativa'})
+    else if(cantidad == 0 ) return res.json({ message : 'No se puede enviar la cantidad en 0'})
     // Verificamos si se quiere ingresar una cantidad mayor a 20
     else if(cantidad > 20) return res.json({ message : 'La cantidad maxima es de 20'})
     let productoAgregado = {}
     try{
         // Buscamos el producto en la base de datos
-        const busProducto = await Producto.findById( producto )
+        const busProducto = await Producto.findById(producto)
         // Buscamos el cliente en la base de datos
         const busCliente = await Registro.findById( cliente )
-        // Almacenamos el nombre del producto
-        const veriProducto = busProducto.nombre
-        // Buscamos el producto del pedido en la base de datos
-        const busProductoPedido = await Carrito.findOne({producto : veriProducto})
         // En caso de que no se encuentre ese producto enviamos un mensaje
         if(!busProducto || busProducto.length === 0) return res.json({ message : 'No existe ese producto' })
         // En caso de que no se encuentre ese cliente enviamos un mensaje
         if(!busCliente || busCliente.length === 0) return res.json({ message : 'No existe ese cliente' })
+        // Almacenamos el nombre del producto
+        const veriProducto = busProducto.nombre
+        // Buscamos el producto del pedido en la base de datos
+        const busProductoPedido = await Carrito.findOne({producto : veriProducto, cliente: cliente})
         // En caso de que se encuentre ese producto en el pedido enviamos un mensaje
         if(busProductoPedido) return res.json({ message : 'Ese producto ya esta en el pedido' })
         // Verificamos en stock que cantidad de producto tenemos
@@ -51,7 +52,9 @@ const agregarProductoPedido = async (req, res) => {
             cliente : cliente,
             producto : busProducto.nombre,
             cantidad : cantidad,
-            precio : busProducto.precio
+            precio : busProducto.precio,
+            idProducto : busProducto.id,
+            imagen : busProducto.imagen.secure_url
         })
         // Guardamos en la base de datos
         await nuevoProductoPedido.save()
@@ -238,7 +241,9 @@ const listarProductosPedido = async (req, res) => {
             mostrar[busCliente._id].push({
                 'Producto' : nombreProducto,
                 'Cantidad' : busProductoPedido[i].cantidad,
-                'Precio' : busProductoPedido[i].precio
+                'Precio' : busProductoPedido[i].precio,
+                'idProducto' : busProductoPedido[i].idProducto,
+                'imagen' : busProductoPedido[i].imagen
             })
             // Sacamos el precio del producto
             const precio = busProductoPedido[i].precio
@@ -370,6 +375,7 @@ const registroPedido = async (req, res) => {
             _id : new mongoose.Types.ObjectId,
             cliente : cliente,
             nombre : nombreCliente,
+            direccion: busCliente.direccion,
             producto : [],
             cantidad : [],
             precio : [],

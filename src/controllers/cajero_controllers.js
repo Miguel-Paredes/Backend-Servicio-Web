@@ -1,18 +1,20 @@
 // Importamos el modelo de Cajero
 const Cajero = require("../models/cajero");
+// Importamos el modelo Registro
+const Registro = require('../models/login.js');
 
 const inicioCajero = async (req, res, next) => {
   // Desestructuramos el objeto req.body
   // Extraemos las propiedades email y password en variables separadas 
   const { email, password } = req.body;
   // Validar todos los campos llenos
-  if (Object.values(req.body).includes('')) return res.status(400).json({msg:'Lo sentimos, debes llenar todos los campos'})
+  if (Object.values(req.body).includes('')) return res.json({msg:'Lo sentimos, debes llenar todos los campos'})
   try {
     // Buscamos el correo en la base de datos
     const user = await Cajero.findOne({ email });
     if(!user || user.length === 0) return next();
     // En caso de que el cajero ya haya iniciado sesion
-    if(user.inicioSesion == true) return res.json({ message : 'El Cajero ya inicio sesion'})
+    if(user.inicioSesion == true) return res.json({ message : 'El Cajero ya inicio sesion',userId : user._id})
     // Desincriptamos la contraseña
     const contra = await user.isCorrectPassword(password)
     // En caso de que el usuario y la contraseña sean incorrectos indicamos enviamos un mensaje
@@ -42,15 +44,23 @@ const crearCajero = async (req, res) => {
   const { email, telefono } = req.body
   try {
     // Validar todos los campos llenos
-    if (Object.values(req.body).includes('')) return res.status(400).json({msg:'Lo sentimos, debes llenar todos los campos'})
-    // Buscamos el correo en la base de datos
+    if (Object.values(req.body).includes('')) return res.json({msg:'Lo sentimos, debes llenar todos los campos'})
+    // Buscamos el correo en la base de datos del cajero
     const exisCorreo = await Cajero.findOne({ email })
-    // Buscamos el correo en la base de datos
+    // Buscamos el correo en la base de datos del cajero
     const exisTelefono = await Cajero.findOne({ telefono })
     // En caso de que exista el correo enviamos un mensaje
-    if(exisCorreo) return res.status(400).json({ msg:'Lo sentimos, el email ya se encuentra registrado' })
+    if(exisCorreo) return res.json({ msg:'Lo sentimos, el email ya se encuentra registrado en los cajeros' })
     // En caso de que exista el telefono enviamos un mensaje
-    if(exisTelefono) return res.status(400).json({ msg:'Lo sentimos, el telefono celular ya se encuentra registrado' })
+    if(exisTelefono) return res.json({ msg:'Lo sentimos, el telefono celular ya se encuentra registrado en los cajeros' })
+    // Buscamos el correo en la base de datos de cliente
+    const exisCorreoCliente = await Registro.findOne({ email })
+    // Buscamos el correo en la base de datos de cliente
+    const exisTelefonoCliente = await Registro.findOne({ telefono })
+    // En caso de que exista el correo enviamos un mensaje
+    if(exisCorreoCliente) return res.json({ msg:'Lo sentimos, ese email ya se encuentra registrado en los clientes' })
+    // En caso de que exista el telefono enviamos un mensaje
+    if(exisTelefonoCliente) return res.json({ msg:'Lo sentimos, el telefono celular ya se encuentra registrado en los clientes' })
     // Creamos una nueva instancia
     const user = new Cajero(req.body);
     // Guardamos el nuevo Usuario en la base de datos
@@ -71,7 +81,7 @@ const actualizarCajero = async (req, res) => {
     const id = req.params.id
     try {
         // Validar todos los campos llenos
-        if (Object.values(req.body).includes('')) return res.status(400).json({msg:'Lo sentimos, debes llenar todos los campos'})
+        if (Object.values(req.body).includes('')) return res.json({msg:'Lo sentimos, debes llenar todos los campos'})
         // Buscamos el correo en la base de datos
         const exisCorreo = await Cajero.findOne({ _id : id })
         if(!exisCorreo || exisCorreo.length === 0) {
@@ -95,9 +105,10 @@ const borrarCajero = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos la propiedad email una variable
     const email = req.params.id
+    console.log(email)
     try {
         // Buscamos el correo en la base de datos
-        const exisCorreo = await Cajero.findOne({ email })
+        const exisCorreo = await Cajero.findOne({ _id : email })
         if(exisCorreo.length === 0 || !exisCorreo) {
             // Si no existe ese cajero enviamos un mensaje 
             res.json({ message : 'No existe ese Cajero' })
@@ -152,10 +163,10 @@ const cierreSesionCajero = async (req, res, next) => {
     // Extraemos la propiedad email en una variable
     const cliente = req.query.cliente;
     // Validar todos los campos llenos
-    if (Object.values(req.body).includes('')) return res.status(400).json({msg:'Lo sentimos, debes llenar todos los campos'})
+    if (Object.values(req.body).includes('')) return res.json({msg:'Lo sentimos, debes llenar todos los campos'})
     try {
       // Buscamos el correo en la base de datos
-      const user = await Cajero.findOne({ cliente });
+      const user = await Cajero.findOne({ _id : cliente });
       if(!user || user.length === 0) return next();
       // En caso de que el cajero ya haya iniciado sesion
       else if(user.inicioSesion == false) return res.json({ message : 'El Cajero no inicio sesion'})
@@ -164,9 +175,10 @@ const cierreSesionCajero = async (req, res, next) => {
       // En caso de que todo este en orden enviamos un mensaje
       else{
           // Actualizamos el campo de inicio de sesion en true
-          await Cajero.findByIdAndUpdate(user._id, {inicioSesion : false}, { new : true})
-          // Enviamos un mensaje de que se autentico el usuario
-          res.redirect(`${process.env.URL}/login`);
+          user.inicioSesion = false
+          user.save()
+          // Enviamos un mensaje de que se cerro la sesion del usuario
+          res.json({ message : 'Adios'})
       }
     }catch(err){
       // Enviamos un mensaje de error en caso de que no se puedo autenticar el Cajero

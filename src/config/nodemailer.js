@@ -25,7 +25,7 @@ const sendMailToUser = (userMail, token) => {
         html: `
         <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; display: flex; justify-content: center; align-items: center; margin-top: 20px; width: 100%;">
             <div style="max-width: 90%; padding: 2rem; text-align: center; border: 1px solid #dddddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-                <div style="background-color: #00FFD1; /* Fondo verde */ padding: 1rem; border-radius: 10px; /* Bordes redondeados */">
+                <div style="background-color: #0d9488; /* Fondo verde */ padding: 1rem; border-radius: 10px; /* Bordes redondeados */">
                     <h1 style="color: #ffffff; margin-bottom: 2rem;">!Bienvenido a nuestra página web! Por favor verifica tu cuenta</h1>
                 </div>
                 <div style="text-align: left; margin-bottom: 1rem;">
@@ -36,7 +36,7 @@ const sendMailToUser = (userMail, token) => {
                         
                         </p>
                 </div>
-                <a href=${process.env.URL}/login/confirmar/${token} style="background-color: #006256; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Confirmar cuenta</a>
+                <a href=${process.env.URL}/login/confirmar/${token} style="background-color: #0d9488; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Confirmar cuenta</a>
                 <footer style="background-color: #ffffff; padding: 1rem; text-align: center;">
                     <p style="color: #666666; margin: 0;">Mika y Vale © 2024. Todos los derechos reservados.</p>
                 </footer>
@@ -67,13 +67,13 @@ const sendMailToRecoveryPassword = async(userMail,token)=>{
     html: `
     <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #ffffff; display: flex; justify-content: center; align-items: center; margin-top: 20px; width: 100%;">
         <div style="max-width: 90%; padding: 2rem; text-align: center; border: 1px solid #dddddd; border-radius: 10px; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
-            <div style="background-color: #00ffd1; /* Fondo verde */ padding: 1rem; border-radius: 10px; /* Bordes redondeados */">
+            <div style="background-color: #0d9488; /* Fondo verde */ padding: 1rem; border-radius: 10px; /* Bordes redondeados */">
                 <h1 style="color: #ffffff; /* Texto blanco */ margin-bottom: 2rem;">Restablece tu contraseña</h1>
             </div>
             <div style="text-align: left; margin-bottom: 1rem;">
                 <p style="color: #333333; margin-bottom: 2rem; text-align: justify;">Para garantizar la seguridad de tu cuenta, te pedimos que restablezcas tu contraseña. Sigue el enlace a continuación para completar el proceso:</p>
             </div>
-            <a href=${process.env.URL}/login/recuperar-password/${token} style="background-color: #006256; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Restablecer Contraseña</a>
+            <a href=${process.env.URL}/login/recuperar-password/${token} style="background-color: #0d9488; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Restablecer Contraseña</a>
             <footer style="background-color: #ffffff; padding: 1rem; text-align: center;">
                 <p style="color: #666666; margin: 0;">Mika y Vale © 2024. Todos los derechos reservados.</p>
             </footer>
@@ -111,7 +111,7 @@ const sendMailToConfirmBuyOfUser = async(userMail,id)=>{
                     </p>
             </div>
 
-            <a href=${process.env.URL}/pedidos/${id} style="background-color: #006256; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Ver pedido</a>
+            <a href=${process.env.URL}/pedidos/${id} style="background-color: #0d9488; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Ver pedido</a>
 
             <footer style="background-color: #ffffff; padding: 1rem; text-align: center;">
                 <p style="color: #666666; margin: 0;">Mika y Vale © 2024. Todos los derechos reservados.</p>
@@ -149,7 +149,7 @@ const sendMailToAdminToUpdateProduct = async(producto)=>{
                 </p>
             </div>
 
-            <a href=${process.env.URL} style="background-color: #006256; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Confirmar cuenta</a>
+            <a href=${process.env.URL} style="background-color: #0d9488; color: #ffffff; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background-color 0.3s; cursor: pointer; display: inline-block; margin-bottom: 1rem; cursor: pointer;">Confirmar cuenta</a>
 
             <footer style="background-color: #ffffff; padding: 1rem; text-align: center;">
                 <p style="color: #666666; margin: 0;">Mika y Vale © 2024. Todos los derechos reservados.</p>
