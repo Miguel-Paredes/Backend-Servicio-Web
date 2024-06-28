@@ -270,11 +270,13 @@ const actualizarCategoriaProducto = async (categoria) => {
         else {
             // Actualizamos la categoria en cada producto
             for (let i = 0 ; i < producto.length ; i++){
-                await Producto.findByIdAndUpdate(
-                    producto[i].id,
-                    { categoria: categoria },
-                    { new: true }
-                )
+                if(producto[i].categoria == categoria){
+                    await Producto.findByIdAndUpdate(
+                        producto[i].id,
+                        { categoria: categoria },
+                        { new: true }
+                    )
+                }
             }
             // Enviamos un mensaje a consola indicando que ya se actualizaron todos los productos
             console.log('Categoria de productos actualizados')

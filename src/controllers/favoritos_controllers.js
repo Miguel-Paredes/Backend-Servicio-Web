@@ -198,11 +198,13 @@ const actualizarCategoriaFavorito = async (categoria) => {
         else{
             // Actualizamos la categoria en cada producto
             for (let i = 0 ; i < favorito.length ; i++){
-                await Favorito.findByIdAndUpdate(
-                    favorito[i].id,
-                    { categoria: categoria },
-                    { new: true }
-                )
+                if(favorito[i].categoria == categoria){
+                    await Favorito.findByIdAndUpdate(
+                        favorito[i].id,
+                        { categoria: categoria },
+                        { new: true }
+                    )
+                }
             }
             // Enviamos un mensaje a consola indicando que ya se actualizaron todos los productos
             console.log('Categoria de productos favoritos actualizados')
