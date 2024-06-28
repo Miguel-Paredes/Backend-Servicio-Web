@@ -189,7 +189,7 @@ const eliminarFavorito = async (productoId) => {
     }
 };
 
-const actualizarCategoriaFavorito = async (categoria) => {
+const actualizarCategoriaFavorito = async (anteriorCategoria, categoria) => {
     try{
         // Buscamos todos los productos con esa categoria
         const favorito = await Favorito.find()
@@ -198,7 +198,7 @@ const actualizarCategoriaFavorito = async (categoria) => {
         else{
             // Actualizamos la categoria en cada producto
             for (let i = 0 ; i < favorito.length ; i++){
-                if(favorito[i].categoria == categoria){
+                if(favorito[i].categoria == anteriorCategoria){
                     await Favorito.findByIdAndUpdate(
                         favorito[i].id,
                         { categoria: categoria },

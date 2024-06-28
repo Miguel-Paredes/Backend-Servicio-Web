@@ -260,7 +260,7 @@ const categoriaProducto = async (req, res) => {
     }
 };
 
-const actualizarCategoriaProducto = async (categoria) => {
+const actualizarCategoriaProducto = async (anteriorCategoria, categoria) => {
     try{
         // Buscamos todos los productos con esa categoria
         const producto = await Producto.find()
@@ -270,7 +270,7 @@ const actualizarCategoriaProducto = async (categoria) => {
         else {
             // Actualizamos la categoria en cada producto
             for (let i = 0 ; i < producto.length ; i++){
-                if(producto[i].categoria == categoria){
+                if(producto[i].categoria == anteriorCategoria){
                     await Producto.findByIdAndUpdate(
                         producto[i].id,
                         { categoria: categoria },

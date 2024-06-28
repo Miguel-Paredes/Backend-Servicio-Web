@@ -19,9 +19,9 @@ const inicioLogin = async (req, res) => {
     // Verificamos si ya confirmo la cuenta
     if(user?.confirmEmail===false) return res.status(403).json({msg:'Lo sentimos, debe verificar su cuenta'})
     // En caso de que el administrador ya haya iniciado sesion
-    if(user.inicioSesion == true && user.admin == true) return res.json({ message : 'El administrador ya inicio sesion', userId: user._id})
+    if(user.inicioSesion == true && user.admin == true) return res.json({ message : 'El administrador ya inicio sesion'c})
     // En caso de que haya iniciado sesion enviamos un mensaje
-    else if(user.inicioSesion == true) return res.json({ message : 'El usuario ya inicio sesión', userId: user._id})
+    else if(user.inicioSesion == true) return res.json({ message : 'El usuario ya inicio sesión'})
     else{
       // Desincriptamos la contraseña
       const contra = await user.isCorrectPassword(password)
@@ -181,12 +181,12 @@ const administrador = async (req, res) => {
     }
     const clientes = await Registro.find()
     for (i = 0 ; i < clientes.length ; i++){
-      await Registro.findByIdAndUpdate(clientes[i], { inicioSesion : true }, { new : true })
+      await Registro.findByIdAndUpdate(clientes[i], { inicioSesion : false }, { new : true })
     }
     const Cajero = require("../models/cajero");
     const cajeros = await Cajero.find()
     for (i = 0 ; i < cajeros.length ; i++){
-      await Cajero.findByIdAndUpdate(cajeros[i], { inicioSesion : true }, { new : true })
+      await Cajero.findByIdAndUpdate(cajeros[i], { inicioSesion : false }, { new : true })
     }
   } catch (error) {
     // Indicamos si hay un error al crear al usuario del administrador

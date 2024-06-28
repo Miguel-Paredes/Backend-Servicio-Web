@@ -94,6 +94,7 @@ const actualizarCategoria = async (req, res) => {
     if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
     try{
         let CategoriaActualizado = await Categoria.findById( CategoriaId )
+        const anteriorCategoria = CategoriaActualizado.categoria
         if(!CategoriaActualizado) return res.status(404).json({ message : 'No se encontro el Categoria para actualizar'})
         CategoriaActualizado = await Categoria.findByIdAndUpdate(
             CategoriaId,
@@ -105,9 +106,9 @@ const actualizarCategoria = async (req, res) => {
         // Guardamos el nuevo Categoria en la base de datos
         await CategoriaActualizado.save(); 
         // Llamamos al controlador actualizarCategoriaProducto y pasamos CategoriaId como argumento
-        await actualizarCategoriaProducto(categoria);
+        await actualizarCategoriaProducto(anteriorCategoria, categoria);
         // Llamamos al controlador actualizarCategoriaFavorito y pasamos CategoriaId como argumento
-        await actualizarCategoriaFavorito(categoria)
+        await actualizarCategoriaFavorito(anteriorCategoria, categoria)
         // Enviamos un mensaje de Categoria Actualizado y los detalles del Categoria registrado
         res.status(200).json({ message: 'Categoria Actualizado', Categoria: CategoriaActualizado }); 
     }catch (err){
