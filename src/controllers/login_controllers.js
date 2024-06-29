@@ -36,8 +36,10 @@ const inicioLogin = async (req, res) => {
       else {
         // Actualizamos el campo de inicio de sesion en true
         await Registro.findByIdAndUpdate(user._id, {inicioSesion : true}, { new : true})
+        // Enviamos el nombre del usuario
+        let username = user.nombre + ' ' + user.apellido
         // Enviamos un mensaje de que se autentico el usuario
-        res.status(200).json({ message: 'Usuario Autenticado Correctamente', userId: user._id });
+        res.status(200).json({ message: 'Usuario Autenticado Correctamente', userId: user._id, username : username });
       }
     }
   } catch (err) {
