@@ -6,6 +6,7 @@ let transporter = nodemailer.createTransport({
     host: process.env.HOST_MAILTRAP,
     // Puerto del servidor de correo (obtenido de variables de entorno)
     port: process.env.PORT_MAILTRAP,
+    secure : false,
     auth: {
         // Usuario de correo (obtenido de variables de entorno)
         user: process.env.USER_MAILTRAP,
