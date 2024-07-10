@@ -563,7 +563,6 @@ module.exports = {
     buscarVenta,
     CajeroVenta,
     mostrarVentasAdministrador,
-    buscarVentaAdministrador,
     verPedidosClientes,
     verPedidosEstadoClientes,
     PrepararPedidoCliente,
