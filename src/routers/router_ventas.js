@@ -10,7 +10,6 @@ const {
     buscarVenta,
     CajeroVenta,
     mostrarVentasAdministrador,
-    buscarVentaAdministrador,
     verPedidosClientes,
     verPedidosEstadoClientes,
     PrepararPedidoCliente,
@@ -29,9 +28,6 @@ routerVentas.use(express.json());
 
 // Ruta para que el administrador pueda ver todo las ventas
 routerVentas.get('/ventas/admin/mostrar', verificadoEmpleados, mostrarVentasAdministrador)
-
-// Ruta para que el administrador pueda buscar un pedido
-routerVentas.get('/ventas/admin/buscar', verificadoEmpleados, buscarVentaAdministrador)
 
 // Ruta para ver la venta de los cajeros
 routerVentas.get('/ventas/cajeros/:id', verificadoEmpleados, verVenta)

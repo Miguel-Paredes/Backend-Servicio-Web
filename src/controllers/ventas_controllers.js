@@ -432,38 +432,6 @@ const mostrarVentasAdministrador = async (req, res) => {
     }
 }
 
-const buscarVentaAdministrador = async (req, res) => {
-    // Desestructuramos el objeto req.body
-    // Extraemos las propiedades telefono y fecha en variables separadas
-    const { telefono, fecha } = req.body
-    // Declaramos el inicio y el fin de las fechas
-    const inicio = new Date(fecha)
-    const fin = new Date(fecha)
-    // Configurar la hora para indicar el final del día 
-    fin.setUTCHours(23, 59, 59, 999); 
-    try {
-        // Buscamos los Ventas en la bdd
-        let cliente = await Cajero.findOne({ telefono : telefono })
-        cliente = cliente.id
-        // En caso de que no existan Ventas enviamos un mensaje
-        if(!cliente || cliente.length === 0) return res.json({ message : 'No ese Cajero'})
-        const Ventas = await Venta.find({
-            cliente : cliente,
-            fecha : {
-                $gte : inicio,
-                $lt : fin
-            }
-        })
-        // Mostramos los Ventas
-        res.json(Ventas)
-    } catch(err){
-        // Enviamos un mensaje en caso de que no se pudo mostrar todos los Ventas
-        res.json({ message : 'Error al mostrar todos los Ventas'})
-        // Mostramos los errores
-        console.log(err)
-    }
-}
-
 const verPedidosClientes = async (req, res) => {
     try{
         // Visualizar todos los pedidos

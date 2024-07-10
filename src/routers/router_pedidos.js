@@ -10,7 +10,6 @@ const {
     actualizarProductoPedido,
     eliminarPedido,
     verPedido,
-    buscarPedidoAdministrador,
     mostrarPedidosAdministrador
 } = require('../controllers/pedidos_controllers');
 // Importamos la autentificacion
@@ -26,9 +25,6 @@ routerPedidos.use(express.json());
 
 // Ruta para que el administrador pueda ver todo los pedidos
 routerPedidos.get('/pedidos/admin/mostrar', verificadoEmpleados, mostrarPedidosAdministrador)
-
-// Ruta para que el administrador pueda buscar un pedido
-routerPedidos.get('/pedidos/admin/buscar', verificadoEmpleados, buscarPedidoAdministrador)
 
 // Ruta para ver todos los pedidos realizados
 routerPedidos.get('/pedidos/mostrar', verificadoAutentication, mostrarPedidos);

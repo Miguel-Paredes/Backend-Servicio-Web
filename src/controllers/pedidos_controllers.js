@@ -473,38 +473,6 @@ const mostrarPedidosAdministrador = async (req, res) => {
     }
 }
 
-const buscarPedidoAdministrador = async (req, res) => {
-    // Desestructuramos el objeto req.body
-    // Extraemos las propiedades telefono y fecha en variables separadas
-    const { telefono, fecha } = req.body
-    // Declaramos el inicio y el fin de las fechas
-    const inicio = new Date(fecha)
-    const fin = new Date(fecha)
-    // Configurar la hora para indicar el final del día 
-    fin.setUTCHours(23, 59, 59, 999);
-    try {
-        // Buscamos los pedidos en la bdd
-        let cliente = await Registro.findOne({ telefono : telefono })
-        cliente = cliente.id
-        // En caso de que no existan pedidos enviamos un mensaje
-        if(!cliente || cliente.length === 0) return res.json({ message : 'No ese cliente'})
-        const Pedidos = await Pedido.find({
-            cliente : cliente,
-            fecha : {
-                $gte : inicio,
-                $lt : fin
-            }
-        })
-        // Mostramos los pedidos
-        res.json(Pedidos)
-    } catch(err){
-        // Enviamos un mensaje en caso de que no se pudo mostrar todos los pedidos
-        res.json({ message : 'Error al mostrar todos los pedidos'})
-        // Mostramos los errores
-        console.log(err)
-    }
-}
-
 module.exports = {
     agregarProductoPedido,
     actualizarProductoPedido,
@@ -515,6 +483,5 @@ module.exports = {
     buscarPedido,
     registroPedido,
     verPedido,
-    mostrarPedidosAdministrador,
-    buscarPedidoAdministrador
+    mostrarPedidosAdministrador
 }

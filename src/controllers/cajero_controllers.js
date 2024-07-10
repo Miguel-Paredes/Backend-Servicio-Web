@@ -91,7 +91,8 @@ const actualizarCajero = async (req, res) => {
             await Cajero.findByIdAndUpdate(id, req.body, { new : true })
             exisCorreo.password = req.body.password
             await exisCorreo.save()
-            res.json({ message : 'Cajero Actualizado', Cajero : exisCorreo })
+            const nuevo_Cajero = exisCorreo
+            res.json({ message : 'Cajero Actualizado', Cajero : nuevo_Cajero })
         }
     }catch(err){
         // Enviamos un mensaje de error en caso de que no se puedo actualizar el Cajero
@@ -105,7 +106,6 @@ const borrarCajero = async (req, res) => {
     // Desestructuramos el objeto req.body
     // Extraemos la propiedad email una variable
     const email = req.params.id
-    console.log(email)
     try {
         // Buscamos el correo en la base de datos
         const exisCorreo = await Cajero.findOne({ _id : email })
