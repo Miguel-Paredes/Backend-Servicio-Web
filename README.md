@@ -52,3 +52,5 @@ Una vez hechas todas las configuraciones se puede usar el comando:
 npm start
 ```
 Este comando pondra en funcionamiento nuestra API, al momento de ponerse en funcionamiento la información del administrador se generara automaticamente y se guardara en la Base de Datos
+## Postman
+Para su interactuar con cada uno de los endpoints correspondientes utilizar la herramienta Postman mediante el siguiente enlace. https://documenter.getpostman.com/view/33300172/2sA3e1CAK2
