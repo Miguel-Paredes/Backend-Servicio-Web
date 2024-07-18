@@ -91,7 +91,7 @@ const actualizarCajero = async (req, res) => {
             await Cajero.findByIdAndUpdate(id, req.body, { new : true })
             exisCorreo.password = req.body.password
             await exisCorreo.save()
-            const nuevo_Cajero = exisCorreo
+            const nuevo_Cajero = await Cajero.findOne({ _id : id })
             res.json({ message : 'Cajero Actualizado', Cajero : nuevo_Cajero })
         }
     }catch(err){
@@ -119,7 +119,7 @@ const borrarCajero = async (req, res) => {
         }
     }catch(err){
         // Enviamos un mensaje de error en caso de que no se puedo borrar el Cajero
-        res.json({ message : 'Error al actualizar Cajero' })
+        res.json({ message : 'Error al borrar Cajero' })
         // Mostramos los errores
         console.log(err)
     }
